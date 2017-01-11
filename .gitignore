@@ -1,0 +1,16 @@
+# Backup files and system temporaries
+*~
+.*.swp
+*.swo
+
+# compiled files
+*.pyc
+*.o
+
+# our build directory
+build
+
+# building external projects:
+external/.last_pull
+external/krims
+external/linalgwrap

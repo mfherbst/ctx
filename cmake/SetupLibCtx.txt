@@ -20,12 +20,35 @@
 ## ---------------------------------------------------------------------
 
 ## This file is provided for compatibility with Q-Chem's libctx.
-
 ## It is of no other use inside this library.
+
+cmake_minimum_required(VERSION 3.0.0)
+
+# Find the compiled stuff
+find_library(CTX_LIBRARY
+	ctx
+	PATHS ${LIBCTX_DIR}/build/src/ctx ${CMAKE_SOURCE_DIR}/../libctx/build/src/ctx
+)
+if(${CTX_LIBRARY} MATCHES "-NOTFOUND")
+	message(FATAL_ERROR "Could not find ctx library at the expected place: ${LIBCTX_DIR}")
+endif()
+
+find_library(KRIMS_LIBRARY
+	krims
+	HINTS "${CTX_LIBRARY}/../../external/krims/src/krims"
+	PATHS ${LIBCTX_DIR}/build/external/krims/src/krims ${CMAKE_SOURCE_DIR}/../krims/build/src/krims
+)
+if(${KRIMS_LIBRARY} MATCHES "-NOTFOUND")
+	message(FATAL_ERROR "Could not find krims library at the expected place: ${LIBCTX_DIR}/build/external/krims")
+endif()
+
+# The include directories are required in the global context:
+include_directories("${LIBCTX_DIR}/src;${LIBCTX_DIR}/external/krims/src")
+
 add_library(ctxLinkTarget INTERFACE IMPORTED GLOBAL)
 set_target_properties(ctxLinkTarget
 	PROPERTIES
-	INTERFACE_LINK_LIBRARIES ctx krims
-	INTERFACE_INCLUDE_DIRECTORIES "${LIBCTX_DIR};${LIBCTX_DIR}/build/external/krims"
+	INTERFACE_LINK_LIBRARIES "${LIBCTX_LIBRARY};${LIBKRIMS_LIBRARY}"
+	INTERFACE_INCLUDE_DIRECTORIES "${LIBCTX_DIR}/src;${LIBCTX_DIR}/external/krims/src"
 )
 set(LIBCTX_LIBS ctxLinkTarget)

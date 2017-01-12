@@ -29,5 +29,6 @@ cd build
 # TODO Could switch on:
 #   - Release only
 #   - Machine speciffic optimisations
-cmake "$@" -DAUTOCHECKOUT_MISSING_REPOS=ON ..
+#   - Shared library build
+cmake "$@" -DAUTOCHECKOUT_MISSING_REPOS=ON -DBUILD_SHARED_LIBS=OFF -DKRIMS_ENABLE_EXAMPLES=OFF ..
 exit 0

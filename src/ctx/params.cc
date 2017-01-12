@@ -21,26 +21,8 @@
 
 namespace ctx {
 
-params::params(const params& other) : params() {
-  const auto& othermap = *other.m_map_ptr;
-  for (auto itkey = othermap.begin_keys(); itkey != othermap.end_keys(); ++itkey) {
-    m_map_ptr->update(*itkey, other.m_map_ptr->at<std::string>(*itkey));
-  }
-}
-
-params& params::operator=(params p) {
-  m_map_ptr = std::move(p.m_map_ptr);
-  m_subtree_cache.clear();
-  return *this;
-}
-
 bool params::subtree_exists(const std::string& key) const {
-  std::string normalised;
-  if (key[0] != '/') {
-    normalised = "/" + key;
-  } else {
-    normalised = key;
-  }
+  const std::string normalised = normalise_key(key);
 
   // The key identifies a subtree if keys of the kind
   // key/${subkey} exist. So we go through the keys starting

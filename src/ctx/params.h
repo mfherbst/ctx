@@ -52,13 +52,33 @@ class params {
   /**	\brief Create an empty parameter tree */
   params() : m_map_ptr{krims::make_unique<krims::ParameterMap>()}, m_subtree_cache{} {}
 
+  /** Create a deep copy of a krims::ParameterMap.
+   *
+   * We copy all values, so the input ParameterMap and
+   * the constructed object have no internal relationship
+   * and operate on different memory.
+   *
+   * \note The ParameterMap may only contain string values,
+   *       i.e. all keys should map to a value type of
+   *       std::string
+   */
+  explicit params(const krims::ParameterMap& map) : params() {
+    for (auto itkey = map.begin_keys(); itkey != map.end_keys(); ++itkey) {
+      m_map_ptr->update(*itkey, map.at<std::string>(*itkey));
+    }
+  }
+
   /**	\brief Create a deep copy of a parameter tree */
-  params(const params& other);
+  params(const params& other) : params(*other.m_map_ptr) {}
 
   params(params&& other) = default;
 
   /** Assignment operator */
-  params& operator=(params p);
+  params& operator=(params p) {
+    m_map_ptr = std::move(p.m_map_ptr);
+    m_subtree_cache.clear();
+    return *this;
+  }
   ///@}
 
   /** \name Existence checks */

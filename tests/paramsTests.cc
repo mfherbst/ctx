@@ -118,13 +118,13 @@ TEST_CASE("Test params", "[params]") {
   }
 
   SECTION("Test workflow with subtrees") {
-    params p;
-    p.set("tree/data", 1);
-    p.set("tree/string", "string");
+    // Construct a params object and initialise with some data:
+    params p({{"/tree/data", "1"}, {"tree/string", "string"}});
     p.set("data", 4);
     p.set("soso", 2);
     p.set("other/data", 99);
 
+    // check that it worked
     REQUIRE(p.subtree_exists("tree"));
     REQUIRE(p.subtree_exists("other"));
     REQUIRE(p.key_exists("data"));
@@ -136,6 +136,7 @@ TEST_CASE("Test params", "[params]") {
     REQUIRE(p.get<int>("tree/data") == 1);
     REQUIRE(p.get<std::string>("tree/string") == "string");
 
+    // Get a subtree to it
     params& sub = p.get_subtree("tree");
     REQUIRE(sub.key_exists("string"));
     REQUIRE(sub.key_exists("data"));

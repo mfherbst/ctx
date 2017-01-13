@@ -42,7 +42,7 @@ class params {
   DefException2(ExcConversionFailed, std::string, std::string,
                 << "Could not convert the value \"" << arg2 << "\" for key \"" << arg1
                 << "\" to the requested type");
-  DefExceptionMsg(ExcEmptyKey, "An empty key is not allowed.");
+  DefException1(ExcInvalidKey, std::string, << "Invalid key encountered: " << arg1);
   //@}
 
   typedef krims::ParameterMap::KeyIterator const_iterator;
@@ -147,6 +147,8 @@ class params {
 
   /** Set an entry. */
   void set(const std::string& key, const std::string& value) {
+    assert_throw(key.find('/') == std::string::npos,
+                 ExcInvalidKey("Key should not contain the \"/\" character."));
     m_map_ptr->update(key, value);
   }
 

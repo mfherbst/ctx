@@ -36,6 +36,8 @@ bool params::subtree_exists(const std::string& key) const {
 }
 
 params& params::get_subtree(const std::string& key) {
+  assert_throw(key.find('/') == std::string::npos,
+               ExcInvalidKey("Key should not contain the \"/\" character."));
   const std::string normalised = normalise_key(key);
 
   // If the subtree cache does not have the required params object for the subtree
@@ -54,7 +56,9 @@ params& params::get_subtree(const std::string& key) {
 }
 
 params& params::merge_subtree(const std::string& key, const params& from) {
-  assert_throw(!key.empty(), ExcEmptyKey());
+  assert_throw(!key.empty(), ExcInvalidKey("An empty key is not allowed here."));
+  assert_throw(key.find('/') == std::string::npos,
+               ExcInvalidKey("Key should not contain the \"/\" character."));
 
   // Perform a full deep copy of the from object
   // and move this copy into ourself.

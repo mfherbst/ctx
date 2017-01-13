@@ -30,5 +30,10 @@ cd build
 #   - Release only
 #   - Machine speciffic optimisations
 #   - Shared library build
-cmake "$@" -DAUTOCHECKOUT_MISSING_REPOS=ON -DBUILD_SHARED_LIBS=OFF -DKRIMS_ENABLE_EXAMPLES=OFF ..
+cmake \
+       -DKRIMS_ENABLE_EXAMPLES=OFF \
+       "$@" -DAUTOCHECKOUT_MISSING_REPOS=ON \
+       -DBUILD_SHARED_LIBS=OFF \
+       -DCTX_ENABLE_LIBCTX_COMPATIBILITY=ON \
+       ..
 exit 0

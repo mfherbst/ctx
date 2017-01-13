@@ -18,6 +18,13 @@
 //
 
 #pragma once
+
+// If DISABLE_LIBCTX_COMPATIBILITY is set, this disables
+// the generation of the libctx namespace and hence makes the
+// code independent of libctx. Then they could theoretically be
+// used side-by-side
+#ifndef DISABLE_LIBCTX_COMPATIBILITY
+
 namespace ctx {
 // Dummy ... we need this for the import to work.
 }  // namespace ctx
@@ -25,3 +32,5 @@ namespace ctx {
 namespace libctx {
 using namespace ctx;
 }  // namespace ctx
+
+#endif  // DISABLE_LIBCTX_NAMESPACE

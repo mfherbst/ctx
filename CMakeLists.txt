@@ -36,6 +36,10 @@ set(PackageModuleLocation share/cmake)
 # setup global options (needs to be done before call to project())
 option(CTX_ENABLE_TESTS "Build ctx tests" ON)
 #option(ADCC_ENABLE_EXAMPLES "Build ctx examples" ON)
+option(CTX_ENABLE_LIBCTX_COMPATIBILITY
+	"Disable libctx compatibility mode. \
+This makes it possible to use Q-Chem's libctx (via libctx namespace) \
+and this ctx library (via the ctx namespace) side-by-side." ON)
 
 ##########################################################################
 # Project setup

@@ -18,8 +18,20 @@
 //
 
 #include <catch.hpp>
+
+// TEST_QCHEM_LIBCTX enables the sections for testing Q-Chem's libctx with this test suite
+// DISABLE_LIBCTX_COMPATIBILITY disables all compatibility and namespace remapping
+//                              from ctx to libctx.
+#if defined DISABLE_LIBCTX_COMPATIBILITY and not defined TEST_QCHEM_LIBCTX
 #include <ctx/ctx_ref.h>
+#else
+#include <libctx/ctx_ref.h>
+#endif
+
 namespace ctx {
+#ifndef DISABLE_LIBCTX_COMPATIBILITY
+using namespace libctx;
+#endif
 namespace tests {
 
 /** Dummy function to enforce conversion to a reference from ctx_ref classes */
@@ -33,8 +45,12 @@ TEST_CASE("Test ctx_ref", "[ctx_ref]") {
   context ctx(stor);
 
   SECTION("Test storing integers") {
+#ifdef TEST_QCHEM_LIBCTX
+    stor.insert("/six", rc_ptr<int>(new int(6)));
+#else
     stor.update("six", 6);
-    ctx.insert("four", make_rcptr<int>(4));
+#endif
+    ctx.insert("four", rc_ptr<int>(new int(4)));
     ctx.insert("five", rc_ptr<int>(new int(5)));
 
     ctx_ref<int> six(ctx, "six");
@@ -47,8 +63,12 @@ TEST_CASE("Test ctx_ref", "[ctx_ref]") {
   }  // integers
 
   SECTION("Test storing strings") {
+#ifdef TEST_QCHEM_LIBCTX
+    stor.insert("/six", rc_ptr<std::string>(new std::string("6")));
+#else
     stor.update("six", "6");
-    ctx.insert("four", make_rcptr<std::string>("4"));
+#endif
+    ctx.insert("four", rc_ptr<std::string>(new std::string("4")));
     ctx.insert("five", rc_ptr<std::string>(new std::string("5")));
 
     ctx_ref<std::string> six(ctx, "six");
@@ -61,8 +81,12 @@ TEST_CASE("Test ctx_ref", "[ctx_ref]") {
   }  // strings
 
   SECTION("Test storing doubles") {
+#ifdef TEST_QCHEM_LIBCTX
+    stor.insert("/six", rc_ptr<double>(new double(6.0)));
+#else
     stor.update("six", 6.0);
-    ctx.insert("four", make_rcptr<double>(4.0));
+#endif
+    ctx.insert("four", rc_ptr<double>(new double(4.0)));
     ctx.insert("five", rc_ptr<double>(new double(5.0)));
 
     ctx_ref<double> six(ctx, "six");

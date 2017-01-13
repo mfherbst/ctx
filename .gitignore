@@ -13,4 +13,5 @@ build
 # building external projects:
 external/.last_pull
 external/krims
+external/libctx
 external/linalgwrap

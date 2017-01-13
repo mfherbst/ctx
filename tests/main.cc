@@ -19,18 +19,19 @@
 
 #define CATCH_CONFIG_RUNNER
 #include <catch.hpp>
+
+// TEST_QCHEM_LIBCTX enables the sections for testing
+// Q-Chem's libctx with this test suite
+#ifndef TEST_QCHEM_LIBCTX
 #include <krims/ExceptionSystem.hh>
-#include <krims/NumComp.hh>
+#endif
 
 int main(int argc, char* const argv[]) {
+#ifndef TEST_QCHEM_LIBCTX
   // Make sure that the program does not get aborted,
   // but all krims exceptions throw instead.
   krims::AssertDbgEffect::set_throw();
-
-  // Throw in case a numerical comparison fails with very detailed
-  // information
-  krims::NumCompConstants::default_failure_action =
-        krims::NumCompActionType::ThrowVerbose;
+#endif
 
   // Run catch:
   int result = Catch::Session().run(argc, argv);

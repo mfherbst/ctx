@@ -44,8 +44,17 @@ if (NOT CMAKE_CXX_STANDARD VERSION_LESS 17)
 	LIST(APPEND CTX_DEFINITIONS "CTX_HAVE_CXX17")
 endif()
 
-
+##################################
+#-- QChem libctx compatibility --#
+##################################
 if (NOT CTX_ENABLE_LIBCTX_COMPATIBILITY)
 	message(STATUS "Disabling full libctx compatibility.")
 	LIST(APPEND CTX_DEFINITIONS "DISABLE_LIBCTX_COMPATIBILITY")
+endif()
+
+################################################
+#-- Running our unit tests with QChem libctx --#
+################################################
+if (TEST_QCHEM_LIBCTX)
+	include(cmake/findQchemLibctx.cmake)
 endif()

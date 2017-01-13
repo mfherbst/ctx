@@ -31,6 +31,8 @@ find_library(CTX_LIBRARY
 )
 if(${CTX_LIBRARY} MATCHES "-NOTFOUND")
 	message(FATAL_ERROR "Could not find ctx library at the expected place: ${LIBCTX_DIR}")
+else()
+	message(STATUS "Found ctx at ${CTX_LIBRARY}")
 endif()
 
 find_library(KRIMS_LIBRARY
@@ -40,15 +42,19 @@ find_library(KRIMS_LIBRARY
 )
 if(${KRIMS_LIBRARY} MATCHES "-NOTFOUND")
 	message(FATAL_ERROR "Could not find krims library at the expected place: ${LIBCTX_DIR}/build/external/krims")
+else()
+	message(STATUS "Found krims at ${KRIMS_LIBRARY}")
 endif()
 
-# The include directories are required in the global context:
+# This thing needs to be called ctx
+add_library(ctx INTERFACE IMPORTED GLOBAL)
+set_target_properties(ctx
+       PROPERTIES
+       INTERFACE_LINK_LIBRARIES "${CTX_LIBRARY};${KRIMS_LIBRARY}"
+       INTERFACE_INCLUDE_DIRECTORIES "${LIBCTX_DIR}/src;${LIBCTX_DIR}/external/krims/src"
+)
+
+# Even though we give this in the ctx target properties, this needs to be global, too.
 include_directories("${LIBCTX_DIR}/src;${LIBCTX_DIR}/external/krims/src")
 
-add_library(ctxLinkTarget INTERFACE IMPORTED GLOBAL)
-set_target_properties(ctxLinkTarget
-	PROPERTIES
-	INTERFACE_LINK_LIBRARIES "${LIBCTX_LIBRARY};${LIBKRIMS_LIBRARY}"
-	INTERFACE_INCLUDE_DIRECTORIES "${LIBCTX_DIR}/src;${LIBCTX_DIR}/external/krims/src"
-)
-set(LIBCTX_LIBS ctxLinkTarget)
+set(LIBCTX_LIBS ctx)

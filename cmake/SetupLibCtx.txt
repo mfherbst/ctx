@@ -24,21 +24,45 @@
 
 cmake_minimum_required(VERSION 3.0.0)
 
-# Find the compiled stuff
+#
+# Determine build type
+#
+# For setting the proper compile definitions for the Debug and Release
+# interface of krims and ctx.
+set(build "RELEASE")
+set(SUFFIX "")
+if (NOT CMAKE_BUILD_TYPE MATCHES "Release")
+	set(SUFFIX ".g")
+        set(build "DEBUG")
+endif()
+
+#
+# Find ctx
+#
 find_library(CTX_LIBRARY
-	ctx
-	PATHS ${LIBCTX_DIR}/build/src/ctx ${CMAKE_SOURCE_DIR}/../libctx/build/src/ctx
+	ctx${SUFFIX}
+	PATHS
+	${LIBCTX_DIR}/build/src/ctx
+	${CMAKE_SOURCE_DIR}/../libctx/build/src/ctx
+	${CMAKE_SOURCE_DIR}/../ctx/build/src/ctx
+	${CMAKE_BINARY_DIR}/../libctx/src/ctx
+	${CMAKE_BINARY_DIR}/../ctx/src/ctx
 )
 if(${CTX_LIBRARY} MATCHES "-NOTFOUND")
-	message(FATAL_ERROR "Could not find ctx library at the expected place: ${LIBCTX_DIR}")
+	message(FATAL_ERROR "Could not find ctx library at the expected place.")
 else()
 	message(STATUS "Found ctx at ${CTX_LIBRARY}")
 endif()
 
+#
+# Find krims
+#
 find_library(KRIMS_LIBRARY
-	krims
-	HINTS "${CTX_LIBRARY}/../../external/krims/src/krims"
-	PATHS ${LIBCTX_DIR}/build/external/krims/src/krims ${CMAKE_SOURCE_DIR}/../krims/build/src/krims
+	krims${SUFFIX}
+	PATHS
+	${LIBCTX_DIR}/build/external/krims/src/krims
+	${CMAKE_SOURCE_DIR}/../krims/build/src/krims
+	${CMAKE_BINARY_DIR}/../krims/src/krims
 )
 if(${KRIMS_LIBRARY} MATCHES "-NOTFOUND")
 	message(FATAL_ERROR "Could not find krims library at the expected place: ${LIBCTX_DIR}/build/external/krims")
@@ -46,25 +70,39 @@ else()
 	message(STATUS "Found krims at ${KRIMS_LIBRARY}")
 endif()
 
-# For setting the proper compile definitions for the Debug and Release
-# interface of krims and ctx.
-set(build "RELEASE")
-if (NOT CMAKE_BUILD_TYPE MATCHES "Release")
-        set(build "DEBUG")
+find_path(KRIMS_INCLUDES
+	"krims/version.hh"
+	PATHS
+	${LIBCTX_DIR}/external/krims/src
+	${LIBCTX_DIR}/../krims/src
+	${CMAKE_SOURCE_DIR}/external/krims/src
+	${CMAKE_SOURCE_DIR}/../krims/src
+)
+if(${KRIMS_INCLUDES} MATCHES "-NOTFOUND")
+	message(FATAL_ERROR "Could not find krims include headers at the expected place.")
+else()
+	message(STATUS "Found krims includes at ${KRIMS_INCLUDES}")
 endif()
 
+#
+# Setup target
+#
 # This thing needs to be called ctx
 add_library(ctx INTERFACE IMPORTED GLOBAL)
 set_target_properties(ctx
        PROPERTIES
        INTERFACE_LINK_LIBRARIES "${CTX_LIBRARY};${KRIMS_LIBRARY}"
-       INTERFACE_INCLUDE_DIRECTORIES "${LIBCTX_DIR}/src;${LIBCTX_DIR}/external/krims/src"
-       COMPILE_DEFINITIONS "${build}=${build}"
+       INTERFACE_INCLUDE_DIRECTORIES "${LIBCTX_DIR}/src;${KRIMS_INCLUDES}"
+       INTERFACE_COMPILE_DEFINITIONS "${build}=${build}"
 )
 
-unset(build)
-
 # Even though we give this in the ctx target properties, this needs to be global, too.
-include_directories("${LIBCTX_DIR}/src;${LIBCTX_DIR}/external/krims/src")
+include_directories("${LIBCTX_DIR}/src;${KRIMS_INCLUDES}")
+add_definitions("-D${build}=${build}")
 
+#
+# Cleanup and publish
+#
+unset(build)
+unset(SUFFIX)
 set(LIBCTX_LIBS ctx)

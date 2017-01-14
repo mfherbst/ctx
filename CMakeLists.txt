@@ -91,4 +91,4 @@ endif()
 include(cmake/install_package.cmake)
 
 # and print a closing message
-message("#\n# Configuring ${PROJECT_NAME} done")
+message("#\n# Configuring ${PROJECT_NAME} done\n")

@@ -46,13 +46,23 @@ else()
 	message(STATUS "Found krims at ${KRIMS_LIBRARY}")
 endif()
 
+# For setting the proper compile definitions for the Debug and Release
+# interface of krims and ctx.
+set(build "RELEASE")
+if (NOT CMAKE_BUILD_TYPE MATCHES "Release")
+        set(build "DEBUG")
+endif()
+
 # This thing needs to be called ctx
 add_library(ctx INTERFACE IMPORTED GLOBAL)
 set_target_properties(ctx
        PROPERTIES
        INTERFACE_LINK_LIBRARIES "${CTX_LIBRARY};${KRIMS_LIBRARY}"
        INTERFACE_INCLUDE_DIRECTORIES "${LIBCTX_DIR}/src;${LIBCTX_DIR}/external/krims/src"
+       COMPILE_DEFINITIONS "${build}=${build}"
 )
+
+unset(build)
 
 # Even though we give this in the ctx target properties, this needs to be global, too.
 include_directories("${LIBCTX_DIR}/src;${LIBCTX_DIR}/external/krims/src")

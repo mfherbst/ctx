@@ -27,8 +27,8 @@ bool params::subtree_exists(const std::string& key) const {
   // The key identifies a subtree if keys of the kind
   // key/${subkey} exist. So we go through the keys starting
   // with the path "key" and check that this is the case
-  for (auto itkey = m_map_ptr->begin_keys(); itkey != m_map_ptr->end_keys(key); ++itkey) {
-    if (0 == itkey->compare(0, normalised.length() + 1, normalised + "/")) {
+  for (auto& kv : *m_map_ptr) {
+    if (0 == kv.key().compare(0, normalised.length() + 1, normalised + "/")) {
       return true;
     }
   }
@@ -45,7 +45,7 @@ params& params::get_subtree(const std::string& key) {
   auto it = m_subtree_cache.find(normalised);
   if (it == std::end(m_subtree_cache)) {
     // Create the new parameter object.
-    params p(krims::make_unique<krims::ParameterMap>(m_map_ptr->submap(normalised)));
+    params p(krims::make_unique<krims::GenMap>(m_map_ptr->submap(normalised)));
 
     // Move in inside the subtree
     auto it = m_subtree_cache.emplace(std::move(normalised), std::move(p)).first;
@@ -70,14 +70,13 @@ params& params::merge_subtree(const std::string& key, const params& from) {
 std::ostream& operator<<(std::ostream& os, const params& p) {
   const char delimiter = '.';
 
-  const auto& map = *p.m_map_ptr;
-  for (auto itkey = map.begin_keys(); itkey != map.end_keys(); ++itkey) {
-    // Since the ParameterMap uses '/' as the delimiter,
+  for (auto& kv : *p.m_map_ptr) {
+    // Since the GenMap uses '/' as the delimiter,
     // we need to replace those characters here.
     // We skip the leading /
 
-    assert_dbg((*itkey)[0] == '/', krims::ExcInternalError());
-    for (auto it = std::begin(*itkey) + 1; it != std::end(*itkey); ++it) {
+    assert_dbg(kv.key()[0] == '/', krims::ExcInternalError());
+    for (auto it = std::begin(kv.key()) + 1; it != std::end(kv.key()); ++it) {
       if (*it == '/') {
         os << delimiter;
       } else {
@@ -85,7 +84,7 @@ std::ostream& operator<<(std::ostream& os, const params& p) {
       }
     }
 
-    os << " = " << map.at<std::string>(*itkey) << std::endl;
+    os << " = " << kv.value<std::string>() << std::endl;
   }
 
   return os;

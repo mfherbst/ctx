@@ -95,7 +95,7 @@ TEST_CASE("Test context", "[context]") {
     stor.insert("/data", make_rcptr<int>(4));
     stor.insert("/other/data", make_rcptr<int>(99));
 #else
-    krims::ParameterMap stor{
+    krims::GenMap stor{
           {"tree/data", 1}, {"tree/string", "string"}, {"data", 4}, {"other/data", 99}};
 #endif
     context ctx(stor);
@@ -131,7 +131,7 @@ TEST_CASE("Test context", "[context]") {
     // Insert from the root_storage object
     stor.insert("/tree/outside", make_rcptr<int>(-12));
 #else
-    // Insert from a ParameterMap submap.
+    // Insert from a GenMap submap.
     stor.submap("tree").update("outside", -12);
 #endif
     REQUIRE(*ctx.get<int>("tree/outside") == -12);
@@ -176,7 +176,7 @@ TEST_CASE("Test context", "[context]") {
     stor.insert("/tree/data", make_rcptr<int>(39));
     stor.insert("/tree/string", make_rcptr<std::string>("string"));
 #else
-    krims::ParameterMap stor{{"tree/data", 39}, {"tree/string", "string"}};
+    krims::GenMap stor{{"tree/data", 39}, {"tree/string", "string"}};
 #endif  // TEST_QCHEM_LIBCTX
     context ctx(stor);
     context tree(ctx, "tree");

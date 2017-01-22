@@ -38,8 +38,8 @@ option(CTX_ENABLE_TESTS "Build ctx tests" ON)
 #option(ADCC_ENABLE_EXAMPLES "Build ctx examples" ON)
 option(TEST_QCHEM_LIBCTX "Build and test Q-Chems libctx library." OFF)
 option(CTX_ENABLE_LIBCTX_COMPATIBILITY
-	"Disable libctx compatibility mode. \
-This makes it possible to use Q-Chem's libctx (via libctx namespace) \
+	"Enable libctx compatibility mode. \
+If this is off, it is possible to use Q-Chem's libctx (via libctx namespace) \
 and this ctx library (via the ctx namespace) side-by-side." ON)
 
 ##########################################################################

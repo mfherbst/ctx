@@ -19,8 +19,8 @@
 
 #pragma once
 #include "libctx_namespace.hh"
-#include <krims/ParameterMap.hh>
+#include <krims/GenMap.hh>
 
 namespace ctx {
-typedef krims::ParameterMap root_storage;
+typedef krims::GenMap root_storage;
 }  // namespace ctx

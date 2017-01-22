@@ -26,11 +26,11 @@
 #ifndef DISABLE_LIBCTX_COMPATIBILITY
 
 namespace ctx {
-// Dummy ... we need this for the import to work.
+// Dummy: We need this for the using statement below.
 }  // namespace ctx
 
 namespace libctx {
 using namespace ctx;
-}  // namespace ctx
+}  // namespace libctx
 
 #endif  // DISABLE_LIBCTX_NAMESPACE

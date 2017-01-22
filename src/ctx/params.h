@@ -21,7 +21,7 @@
 
 #include "libctx_namespace.hh"
 #include <iostream>
-#include <krims/ParameterMap.hh>
+#include <krims/GenMap.hh>
 #include <krims/make_unique.hh>
 #include <map>
 #include <sstream>
@@ -38,33 +38,33 @@ class params {
  public:
   /** \name Exception definitions */
   //@{
-  typedef krims::ParameterMap::ExcUnknownKey ExcUnknownKey;
+  typedef krims::GenMap::ExcUnknownKey ExcUnknownKey;
   DefException2(ExcConversionFailed, std::string, std::string,
                 << "Could not convert the value \"" << arg2 << "\" for key \"" << arg1
                 << "\" to the requested type");
   DefException1(ExcInvalidKey, std::string, << "Invalid key encountered: " << arg1);
   //@}
 
-  typedef krims::ParameterMap::KeyIterator const_iterator;
+  typedef krims::GenMap::const_iterator const_iterator;
 
   /**  \name Constructors */
   ///@{
   /**	\brief Create an empty parameter tree */
-  params() : m_map_ptr{krims::make_unique<krims::ParameterMap>()}, m_subtree_cache{} {}
+  params() : m_map_ptr{krims::make_unique<krims::GenMap>()}, m_subtree_cache{} {}
 
-  /** Create a deep copy of a krims::ParameterMap.
+  /** Create a deep copy of a krims::GenMap.
    *
-   * We copy all values, so the input ParameterMap and
+   * We copy all values, so the input GenMap and
    * the constructed object have no internal relationship
    * and operate on different memory.
    *
-   * \note The ParameterMap may only contain string values,
+   * \note The GenMap may only contain string values,
    *       i.e. all keys should map to a value type of
    *       std::string
    */
-  explicit params(const krims::ParameterMap& map) : params() {
-    for (auto itkey = map.begin_keys(); itkey != map.end_keys(); ++itkey) {
-      m_map_ptr->update(*itkey, map.at<std::string>(*itkey));
+  explicit params(const krims::GenMap& map) : params() {
+    for (auto& kv : map) {
+      m_map_ptr->update(kv.key(), kv.value<std::string>());
     }
   }
 
@@ -98,10 +98,10 @@ class params {
   /** \name Get data */
   ///@{
   //  /** \brief Returns iterator to start of the key range */
-  //  const_iterator begin() const { return m_map_ptr->begin_keys(); }
+  //  const_iterator begin() const { return m_map_ptr->begin(); }
   //
   //  /** \brief Returns iterator to end */
-  //  const_iterator end() const { return m_map_ptr->end_keys(); }
+  //  const_iterator end() const { return m_map_ptr->end(); }
 
   /** \brief Return a subtree (const version)
    *
@@ -161,13 +161,13 @@ class params {
    * as strings, so you will only able to get<std::string> from
    * the map.
    */
-  krims::ParameterMap& map() { return *m_map_ptr; }
+  krims::GenMap& map() { return *m_map_ptr; }
 
   /** Get the underlying parameter map. (Const version)
    *
    * See non-const version above for details.
    */
-  const krims::ParameterMap& map() const { return *m_map_ptr; }
+  const krims::GenMap& map() const { return *m_map_ptr; }
 
   /** Parse the value referred to by the key to a vector of
    *  arbitrary type and return it.
@@ -206,16 +206,16 @@ class params {
 
  private:
   /** Internal constructor to make a params object from an already existent
-   *  pointer to a  ParameterMap */
-  params(std::unique_ptr<krims::ParameterMap> map_ptr)
+   *  pointer to a  GenMap */
+  params(std::unique_ptr<krims::GenMap> map_ptr)
         : m_map_ptr(std::move(map_ptr)), m_subtree_cache() {}
 
   std::string normalise_key(const std::string& raw_key) const {
     return raw_key[0] == '/' ? raw_key : "/" + raw_key;
   }
 
-  //! The ParameterMap representing this tree. Contains only strings.
-  std::unique_ptr<krims::ParameterMap> m_map_ptr;
+  //! The GenMap representing this tree. Contains only strings.
+  std::unique_ptr<krims::GenMap> m_map_ptr;
 
   //! Cache for subtree objects.
   mutable std::map<std::string, params> m_subtree_cache;
@@ -228,8 +228,8 @@ class params {
 template <typename T>
 T params::get(const std::string& key) const {
   T t;
-  const bool success = (std::istringstream(get_str(key)) >> t);
-  assert_throw(success, ExcConversionFailed(key, get_str(key)));
+  const bool fail = !(std::istringstream(get_str(key)) >> t);
+  assert_throw(!fail, ExcConversionFailed(key, get_str(key)));
   return t;
 }
 

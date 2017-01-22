@@ -28,7 +28,7 @@ namespace ctx {
  *  object by Epifanovsky et. al.
  *
  *  The purpose is to provide a libctx-like interface to our
- *  krims::ParameterMap, which is in fact typedefed to ``root_storage``.
+ *  krims::GenMap, which is in fact typedefed to ``root_storage``.
  *
  *  We also use C++ 11 smart pointers instead of their rc_ptr objects.
  */
@@ -38,11 +38,11 @@ class context {
   DefException1(ExcExistingKey, std::string,
                 << "The key " << arg1
                 << " already exists in the context. Use update() to update the key.");
-  typedef krims::ParameterMap::ExcUnknownKey ExcUnknownKey;
+  typedef krims::GenMap::ExcUnknownKey ExcUnknownKey;
 
   /** \name Constructors */
   ///@{
-  /** Create from root_storage, i.e. ParameterMap */
+  /** Create from root_storage, i.e. GenMap */
   context(root_storage& stor) : m_map_ptr{krims::make_subscription(stor, "context")} {}
 
   /** Create a subcontext of the referenced context */
@@ -111,11 +111,11 @@ class context {
   /** If the key exists return true, else false */
   bool key_exists(const std::string& key) const { return m_map_ptr->exists(key); }
 
-  /** Return a reference to the krims::ParameterMap used to store the values */
-  krims::ParameterMap& map() { return *m_map_ptr; }
+  /** Return a reference to the krims::GenMap used to store the values */
+  krims::GenMap& map() { return *m_map_ptr; }
 
-  /** Return a const reference to the krims::ParameterMap used to store the values */
-  const krims::ParameterMap& map() const { return *m_map_ptr; }
+  /** Return a const reference to the krims::GenMap used to store the values */
+  const krims::GenMap& map() const { return *m_map_ptr; }
 
  private:
   krims::RCPWrapper<root_storage> m_map_ptr;

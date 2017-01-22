@@ -3,10 +3,9 @@
 ``ctx`` is a drop-in replacement for the default context library ``libctx``
 of the Q-Chem quantum chemistry software. It provides (almost) the same
 interface as ``libctx``, but uses a different backend, namely the
-``krims::ParameterMap`` class of the
-[krims](https://github.com/linalgwrap/krims.git) library.
-The main purpose of this library is therefore to provide an interface between
-``libctx::context`` objects and ``krims::ParameterMap`` objects.
+``krims::GenMap`` class of the [krims](https://github.com/linalgwrap/krims.git) library.
+The main purpose of this ``ctx`` library is therefore to provide an interface between
+``libctx::context`` objects and ``krims::GenMap`` objects.
 
 ## Obtaining and building ``ctx``
 Check out the ``ctx`` git repository on ``ccsvn.iwr.uni-heidelberg.de``.
@@ -41,12 +40,12 @@ My reasons were:
 - ``libctx`` has a very verbose and clunky interface.
 - The ``rc_ptr`` implementation of a reference-counted pointer is
   not thread-safe.
-- The ``ParameterMap`` we recently implemented into the ``krims``
+- The ``GenMap`` we recently implemented into the ``krims``
   library has a more intuitive interface when it comes to updating
   or storing data. It also provides more features for accessing
   stored values. Error messages are more verbose.
 - ``context`` objects in ``libctx`` do not allow to
-  iterate over the keys they contain.
+  iterate over the keys or the value they contain.
   One always has to *know* what keys are sensible.
 
 ## Replacing Q-Chem's ``libctx`` by ``ctx``
@@ -60,21 +59,41 @@ I have thoroughly tested both ``ctx`` and ``libctx``
 using the unit test suite in this project and made
 sure that both libraries show the identical behaviour.
 Of cause there could be things I have missed, so
-please beware that ``ctx`` is *not exactly} ``libctx``.   
+please beware that ``ctx`` is *not exactly* ``libctx``.   
 
 Other points to note:
-- ``ctx`` and ``libctx`` largely show have the same interface,
+- ``ctx`` and ``libctx`` largely have the same interface,
   but in order to simplify the implementation with the
-  ``krims::ParameterMap`` I decided to drop support for some stuff.
-  To the best of my knowledge these features have been unused anyway.
-  If this leads to problems when compiling code,
+  ``krims::GenMap`` I decided to drop support for some stuff.
+  To the best of my knowledge these features are not used anywhere.
+  If this leads to problems when compiling Q-Chem code,
   please let [me](AUTHORS.md) know. I consider this a bug.
-- Most notable this concerns:
+- Most notable deviations from ``libctx``:
 	- [``params``](src/ctx/params.h) has no support for iterators
-	- [``params``](src/ctx/params.h) may not take keys containing the character "/".
+	- Keys inside [``params``](src/ctx/params.h) objects may not
+	  contain the character "/".
 
 ### Improvements over ``libctx``
-- TODO: Mention extra interface to ``context`` and ``params`` via a ``ParameterMap`` reference.
+- This library has extra functionality via the interface to the internal ``GenMap``
+  objects.
+- The ``root_storage`` of ``ctx::context`` objects is exactly the ``GenMap``.
+  In other words, ``ctx::context`` is really only a wrapper around ``GenMap``.
+  Since all changes done by either acting on the ``root_storage`` as well
+  as the ``ctx::context`` effect the other object, both interfaces
+  can be used simultaneously, e.g.
+  ```cpp
+  krims::GenMap stor{{"bla", 5}};
+  ctx::context ctx(stor);
+
+  ctx.update("bla", rc_ptr<int>(new int(6)));
+  stor.update("bla",7);
+
+  std::cout << *ctx.get<int>("bla");
+  ```
+  will print the value ``7`` which has been set via the ``stor`` object,
+  i.e. the ``GenMap`` interface.
+- ``ctx::params`` objects contain a ``GenMap`` to store their data.
+  It can be referenced (and altered) using the ``map()`` function.
 
 ### Testing Q-Chem's ``libctx`` against the ``ctx`` test suite
 It is possible to run the test suite of this library against Q-Chem's ``libctx`` library code.   
@@ -84,7 +103,7 @@ built under ``external/libctx``. You can roughly achieve this like so
 ```
 # First checkout libctx into external/libctx
 cd external
-./get_libctx.sh
+svn checkout https://url/to/libctx/trunk libctx
 
 # Compile libctx into external/libctx/build
 cd libctx
@@ -93,7 +112,8 @@ cd build
 cmake ..
 make -j 4
 ```
-Now you can configure the built of this project as usual.
-Just set the cmake property ``TEST_QCHEM_LIBCTX`` via
-the flag ``-DTEST_QCHEM_LIBCTX=ON`` when you run run cmake.
-
+Now you can configure the built of this project.
+In order to also make the test which employs the ``libctx``
+in ``external/libctx`` set the cmake property
+``TEST_QCHEM_LIBCTX`` via the commandline flag ``-DTEST_QCHEM_LIBCTX=ON``
+when you run cmake.

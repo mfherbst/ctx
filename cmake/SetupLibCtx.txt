@@ -31,7 +31,8 @@ cmake_minimum_required(VERSION 3.0.0)
 # interface of krims and ctx.
 set(build "RELEASE")
 set(SUFFIX "")
-if (NOT CMAKE_BUILD_TYPE MATCHES "Release")
+if (NOT CMAKE_BUILD_TYPE STREQUAL "" AND NOT CMAKE_BUILD_TYPE MATCHES "Release")
+	# If build type is set and not Release
 	set(SUFFIX ".g")
         set(build "DEBUG")
 endif()

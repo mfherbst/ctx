@@ -59,7 +59,9 @@ install(TARGETS ${ctx_TARGETS}
 install(DIRECTORY .
 	DESTINATION "include/ctx"
 	COMPONENT devel
-	FILES_MATCHING PATTERN "*.hh"
+	FILES_MATCHING
+	PATTERN "*.hh"
+	PATTERN "*.h"
 )
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/version_defs.hh"
 	DESTINATION "include/ctx"

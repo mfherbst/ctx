@@ -17,20 +17,25 @@
 // along with ctx. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#define CATCH_CONFIG_RUNNER
-#include <catch.hpp>
-
 // TEST_QCHEM_LIBCTX enables the sections for testing
 // Q-Chem's libctx with this test suite
 #ifndef TEST_QCHEM_LIBCTX
+// Setup the krims exception system for the tests.
+#define KRIMS_INIT_EXCEPTION_SYSTEM
 #include <krims/ExceptionSystem.hh>
-#endif
+
+#include <krims/NumComp.hh>
+#endif  // TEST_QCHEM_LIBCTX
+
+#define CATCH_CONFIG_RUNNER
+#include <catch.hpp>
 
 int main(int argc, char* const argv[]) {
 #ifndef TEST_QCHEM_LIBCTX
-  // Make sure that the program does not get aborted,
-  // but all krims exceptions throw instead.
-  krims::AssertDbgEffect::set_throw();
+  // Throw in case a numerical comparison fails with very
+  // detailed information
+  krims::NumCompConstants::default_failure_action =
+        krims::NumCompActionType::ThrowVerbose;
 #endif
 
   // Run catch:

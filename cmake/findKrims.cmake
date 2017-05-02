@@ -50,7 +50,8 @@ endif()
 
 # Try to find krims somewhere
 find_package(krims ${KRIMS_VERSION} QUIET CONFIG)
-string(TOUPPER "${PROJECT_NAME}" PROJECT_UPPER)
+mark_as_advanced(krims_DIR)
+
 if ("${krims_DIR}" STREQUAL "krims_DIR-NOTFOUND")
 	if (AUTOCHECKOUT_MISSING_REPOS)
 		execute_process(
@@ -67,6 +68,7 @@ if ("${krims_DIR}" STREQUAL "krims_DIR-NOTFOUND")
 		#
 		add_subdirectory(${PROJECT_SOURCE_DIR}/external/krims)
 		include_directories(${PROJECT_SOURCE_DIR}/external/krims/src)
+		include_directories(${PROJECT_BINARY_DIR}/external/krims/src)
 
 		# Extract version from CMakeLists.txt:
 		file(STRINGS "${PROJECT_SOURCE_DIR}/external/krims/CMakeLists.txt"
@@ -87,7 +89,7 @@ was found.")
 
 	message(FATAL_ERROR "Could not find krims library.
 Either provide the installation prefix of the krims library in the environment \
-variable krims_DIR or enable autocheckout via -DAUTOCHECKOUT_MISSING_REPOS=ON.")
+variable krims_DIR or enable autocheckout via '-DAUTOCHECKOUT_MISSING_REPOS=ON'.")
 endif()
 
 message(WARNING "This part of findKrims has never been tested.")

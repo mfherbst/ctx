@@ -63,6 +63,11 @@ enable_testing()
 # Determine and setup compiler flags, enforcing C++11
 drb_setup_compiler_flags(11)
 
+# Export compile commands if cmake supports it.
+if (CMAKE_VERSION VERSION_GREATER 3.5.0)
+	set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+endif()
+
 # setup hard dependencies
 include(cmake/setup_dependencies.cmake)
 

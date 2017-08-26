@@ -27,13 +27,15 @@ flags = [
     '-std=c++14',
     # Treat .h header files as c++:
     '-x', 'c++',
-    # Include other libraries and show errors and 
+    # Include other libraries and show errors and
     # warnings within them
-    # To suppress errors shown here, use "-isystem" 
+    # To suppress errors shown here, use "-isystem"
     # instead of "-I"
     '-I', 'src',
-    '-isystem', './external/krims/src',
-    '-isystem', './build/external/catch/src/catchFromGit/include',
+    '-I', 'build/src',
+    '-isystem', 'external/krims/src',
+    '-isystem', 'build/external/krims/src',
+    '-isystem', 'build/external/catch/src/catchFromGit/include',
     # Explicit clang includes:
     '-isystem', '/usr/lib/ycmd/clang_includes',
 ]

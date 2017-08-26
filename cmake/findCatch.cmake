@@ -61,6 +61,7 @@ find_path(catch_INCLUDE_DIR catch.hpp
 	${PROJECT_SOURCE_DIR}/../krims/modules/catch/include
 	DOC "catch include directory"
 )
+mark_as_advanced(catch_INCLUDE_DIR)
 
 string(TOUPPER "${PROJECT_NAME}" PROJECT_UPPER)
 if ("${catch_INCLUDE_DIR}" STREQUAL "catch_INCLUDE_DIR-NOTFOUND")
@@ -69,6 +70,7 @@ if ("${catch_INCLUDE_DIR}" STREQUAL "catch_INCLUDE_DIR-NOTFOUND")
 		ExternalProject_Add(catchFromGit
 			PREFIX "${PROJECT_BINARY_DIR}/external/catch"
 			GIT_REPOSITORY "https://github.com/philsquared/Catch"
+			GIT_TAG "v1.6.0"   # TODO Latest version known to work
 			#
 			# No configure or build neccessary
 			CONFIGURE_COMMAND ""

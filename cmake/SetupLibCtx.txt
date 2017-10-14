@@ -55,6 +55,10 @@ else()
 	message(STATUS "Found ctx at ${CTX_LIBRARY}")
 endif()
 
+# Deduce the include directory for generated headers and sources of ctx
+get_filename_component(CTX_BUILD_INCLUDES "${CTX_LIBRARY}" DIRECTORY)
+set(CTX_BUILD_INCLUDES "${CTX_BUILD_INCLUDES}/..")
+
 #
 # Find krims
 #
@@ -70,6 +74,9 @@ if(${KRIMS_LIBRARY} MATCHES "-NOTFOUND")
 else()
 	message(STATUS "Found krims at ${KRIMS_LIBRARY}")
 endif()
+# Deduce the include directory for generated headers and sources of krims
+get_filename_component(KRIMS_BUILD_INCLUDES "${KRIMS_LIBRARY}" DIRECTORY)
+set(KRIMS_BUILD_INCLUDES "${KRIMS_BUILD_INCLUDES}/..")
 
 find_path(KRIMS_INCLUDES
 	"krims/version.hh"
@@ -93,12 +100,12 @@ add_library(ctx INTERFACE IMPORTED GLOBAL)
 set_target_properties(ctx
        PROPERTIES
        INTERFACE_LINK_LIBRARIES "${CTX_LIBRARY};${KRIMS_LIBRARY}"
-       INTERFACE_INCLUDE_DIRECTORIES "${LIBCTX_DIR}/src;${KRIMS_INCLUDES}"
+       INTERFACE_INCLUDE_DIRECTORIES "${LIBCTX_DIR}/src;${CTX_BUILD_INCLUDES};${KRIMS_INCLUDES};${KRIMS_BUILD_INCLUDES}"
        INTERFACE_COMPILE_DEFINITIONS "${build}=${build}"
 )
 
 # Even though we give this in the ctx target properties, this needs to be global, too.
-include_directories("${LIBCTX_DIR}/src;${KRIMS_INCLUDES}")
+include_directories("${LIBCTX_DIR}/src;${CTX_BUILD_INCLUDES};${KRIMS_INCLUDES};${KRIMS_BUILD_INCLUDES}")
 add_definitions("-D${build}=${build}")
 
 #

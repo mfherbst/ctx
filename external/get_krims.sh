@@ -31,7 +31,7 @@
 FROM="https://github.com/lazyten/krims.git"
 
 # Branch to checkout (empty for default)
-BRANCH=""
+BRANCH="f87dfb1b16768ad0127dc1d5cd586d7b902d7967"
 
 # Folder to check it out to
 WHAT="krims"

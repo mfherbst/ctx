@@ -20,9 +20,6 @@ flags = [
     '-fexceptions',
     # Compile debug code as well
     '-DDEBUG',
-    # C++14 code blocks:
-    '-DKRIMS_HAVE_CXX14',
-    '-DADCC_HAVE_CXX14',
     # Compile as c++14
     '-std=c++14',
     # Treat .h header files as c++:

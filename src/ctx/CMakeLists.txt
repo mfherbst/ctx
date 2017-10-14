@@ -58,7 +58,7 @@ install(DIRECTORY .
 	PATTERN "*.hh"
 	PATTERN "*.h"
 )
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/src/ctx/config.hh"
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/config.hh"
 	DESTINATION "include/ctx"
 	COMPONENT devel
 )

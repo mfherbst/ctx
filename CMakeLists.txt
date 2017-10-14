@@ -20,27 +20,13 @@
 ## ---------------------------------------------------------------------
 
 cmake_minimum_required(VERSION 3.0.0)
+cmake_policy(VERSION 3.0.0)
 
 # Load the DebugReleaseBuild module for a simultaneous Debug and Release
 # and release build and initialise it.
 include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/IncludeKrimsCmakeModule.cmake")
 include_krims_cmake_module(DebugReleaseBuild)
 drb_init()
-
-##########################################################################
-# Global options
-
-# Path where cmake wants the modules and config packages:
-set(PackageModuleLocation share/cmake)
-
-# setup global options (needs to be done before call to project())
-option(CTX_ENABLE_TESTS "Build ctx tests" ON)
-#option(ADCC_ENABLE_EXAMPLES "Build ctx examples" ON)
-option(TEST_QCHEM_LIBCTX "Build and test Q-Chems libctx library." OFF)
-option(CTX_ENABLE_LIBCTX_COMPATIBILITY
-	"Enable libctx compatibility mode. \
-If this is off, it is possible to use Q-Chem's libctx (via libctx namespace) \
-and this ctx library (via the ctx namespace) side-by-side." ON)
 
 ##########################################################################
 # Project setup
@@ -56,6 +42,18 @@ include_directories("${ctx_BINARY_DIR}/src")
 
 # enable testing of this project
 enable_testing()
+
+##########################################################################
+# Global options
+
+# setup global options (needs to be done before call to project())
+option(CTX_ENABLE_TESTS "Build ctx tests" ON)
+#option(CTX_ENABLE_EXAMPLES "Build ctx examples" ON)
+option(TEST_QCHEM_LIBCTX "Build and test Q-Chems libctx library." OFF)
+option(CTX_ENABLE_LIBCTX_COMPATIBILITY
+	"Enable libctx compatibility mode. \
+If this is off, it is possible to use Q-Chem's libctx (via libctx namespace) \
+and this ctx library (via the ctx namespace) side-by-side." ON)
 
 ##########################################################################
 # Setup hard and optional dependencies and find components

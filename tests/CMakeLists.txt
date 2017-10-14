@@ -36,13 +36,6 @@ drb_add_executable(ctx_tests
 	FILES ${CTX_TESTS_SOURCES}
 )
 
-drb_target_compile_definitions(ALL     ctx_tests
-	PRIVATE ${CTX_DEFINITIONS})
-drb_target_compile_definitions(DEBUG   ctx_tests
-	PRIVATE ${CTX_DEFINITIONS_DEBUG})
-drb_target_compile_definitions(RELEASE ctx_tests
-	PRIVATE ${CTX_DEFINITIONS_RELEASE})
-
 drb_target_link_libraries(ALL     ctx_tests
 	${CTX_DEPENDENCIES} ${CTX_DEPENDENCIES_TEST})
 drb_target_link_libraries(DEBUG   ctx_tests

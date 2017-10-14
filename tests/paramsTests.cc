@@ -22,7 +22,11 @@
 // TEST_QCHEM_LIBCTX enables the sections for testing Q-Chem's libctx with this test suite
 // DISABLE_LIBCTX_COMPATIBILITY disables all compatibility and namespace remapping
 //                              from ctx to libctx.
-#if defined DISABLE_LIBCTX_COMPATIBILITY and not defined TEST_QCHEM_LIBCTX
+#if not defined TEST_QCHEM_LIBCTX
+#include "ctx/config.hh"
+#endif  // TEST_QCHEM_LIBCTX
+
+#if defined DISABLE_LIBCTX_COMPATIBILITY
 #include <ctx/params.h>
 #else
 #include <libctx/params.h>
@@ -94,7 +98,7 @@ TEST_CASE("Test params", "[params]") {
     std::vector<int> vint;
     p.get_vec("wsp", vint);
 #else
-    auto vint = p.get_vec<int>("wsp");
+    auto vint  = p.get_vec<int>("wsp");
 #endif
     REQUIRE(vint.empty());
 
@@ -103,7 +107,7 @@ TEST_CASE("Test params", "[params]") {
     std::vector<double> vdbl;
     p.get_vec("wsp", vdbl);
 #else
-    auto vdbl = p.get_vec<double>("wsp");
+    auto vdbl  = p.get_vec<double>("wsp");
 #endif
     REQUIRE(vdbl.empty());
 
@@ -133,7 +137,7 @@ TEST_CASE("Test params", "[params]") {
     std::vector<int> vint;
     p.get_vec("d", vint);
 #else
-    auto vint = p.get_vec<int>("d");
+    auto vint  = p.get_vec<int>("d");
 #endif
     REQUIRE(vint.size() == 2);
     REQUIRE(vint[0] == 1);
@@ -144,7 +148,7 @@ TEST_CASE("Test params", "[params]") {
     std::vector<double> vdbl;
     p.get_vec("d", vdbl);
 #else
-    auto vdbl = p.get_vec<double>("d");
+    auto vdbl  = p.get_vec<double>("d");
 #endif
     REQUIRE(vdbl.size() == 4);
     REQUIRE(vdbl[0] == 11000.);

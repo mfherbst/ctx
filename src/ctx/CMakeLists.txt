@@ -24,9 +24,8 @@ set(CTX_SOURCES
   version.cc
 )
 
-# Dump the current version as an include file.
-include_krims_cmake_module(WriteVersionHeader)
-write_version_header("${CMAKE_BINARY_DIR}/src/ctx/version_defs.hh")
+# Write the config file config.hh
+configure_file("config.hh.in"  "config.hh")
 
 # Add the libraries for Debug and Release builds:
 drb_add_library(ctx
@@ -39,10 +38,6 @@ drb_set_target_properties(
 	PROPERTIES
 	VERSION "${PROJECT_VERSION}"
 )
-
-drb_target_compile_definitions(ALL     ctx PUBLIC ${CTX_DEFINITIONS})
-drb_target_compile_definitions(DEBUG   ctx PUBLIC ${CTX_DEFINITIONS_DEBUG})
-drb_target_compile_definitions(RELEASE ctx PUBLIC ${CTX_DEFINITIONS_RELEASE})
 
 drb_target_link_libraries(ALL     ctx ${CTX_DEPENDENCIES})
 drb_target_link_libraries(DEBUG   ctx ${CTX_DEPENDENCIES_DEBUG})
@@ -63,7 +58,7 @@ install(DIRECTORY .
 	PATTERN "*.hh"
 	PATTERN "*.h"
 )
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/version_defs.hh"
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/src/ctx/config.hh"
 	DESTINATION "include/ctx"
 	COMPONENT devel
 )
@@ -83,5 +78,5 @@ export(EXPORT CtxTargets
 install(EXPORT CtxTargets
 	FILE "ctxTargets.cmake"
 	NAMESPACE Upstream::
-	DESTINATION "${PackageModuleLocation}/ctx"
+	DESTINATION "share/cmake/ctx"
 )

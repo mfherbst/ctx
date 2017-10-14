@@ -21,7 +21,6 @@
 
 # Installs the cmake package information this project provides
 #
-# Requires the variable PackageModuleLocation to be set.
 
 # Write a basic version file for ctx
 include(CMakePackageConfigHelpers)
@@ -40,7 +39,7 @@ configure_file(cmake/ctxConfig.cmake.in
 install(FILES
 	"${ctx_BINARY_DIR}/ctxConfig.cmake"
 	"${ctx_BINARY_DIR}/ctxConfigVersion.cmake"
-	DESTINATION "${PackageModuleLocation}/ctx"
+	DESTINATION "share/cmake/ctx"
 	COMPONENT devel
 )
 

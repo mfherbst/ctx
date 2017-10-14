@@ -18,20 +18,28 @@
 //
 
 #pragma once
-#include "ctx/config.hh"
-
-// If DISABLE_LIBCTX_COMPATIBILITY is set, this disables
-// the generation of the libctx namespace and hence makes the
-// code independent of libctx. Then they could theoretically be
-// usable side-by-side
-#ifndef DISABLE_LIBCTX_COMPATIBILITY
-
 namespace ctx {
-// Dummy: We need this for the using statement below.
+/* clang-format off */
+
+//
+// Detail namespace
+//
+namespace detail {
+constexpr int version_major { @PROJECT_VERSION_MAJOR@ };
+constexpr int version_minor { @PROJECT_VERSION_MINOR@ };
+constexpr int version_patch { @PROJECT_VERSION_PATCH@ };
+}  // namespace detail
+
+//
+// Definitions of features
+//
+#ifndef CXX_STANDARD
+#define CXX_STANDARD @CMAKE_CXX_STANDARD@
+#endif
+#cmakedefine CTX_HAVE_CXX14
+#cmakedefine CTX_HAVE_CXX17
+
+#cmakedefine DISABLE_LIBCTX_COMPATIBILITY
+
+/* clang-format on */
 }  // namespace ctx
-
-namespace libctx {
-using namespace ctx;
-}  // namespace libctx
-
-#endif  // DISABLE_LIBCTX_NAMESPACE

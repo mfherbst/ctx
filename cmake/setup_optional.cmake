@@ -27,21 +27,17 @@
 #       CTX_DEPENDENCIES_RELEASE		release mode needs these extras
 #       CTX_DEPENDENCIES_TEST			tests need these extra libraries
 #
-#       CTX_DEFINITIONS				definitions for all compilation
-#       CTX_DEFINITIONS_DEBUG			definitions for debug mode
-#       CTX_DEFINITIONS_RELEASE			definitions for release mode
-#
 
 ####################
 #-- C++ standard --#
 ####################
 if (NOT CMAKE_CXX_STANDARD VERSION_LESS 14)
 	message(STATUS "Detected C++14 support: Setting CTX_HAVE_CXX14")
-	LIST(APPEND CTX_DEFINITIONS "CTX_HAVE_CXX14")
+	set(CTX_HAVE_CXX14 ON)
 endif()
 if (NOT CMAKE_CXX_STANDARD VERSION_LESS 17)
 	message(STATUS "Detected C++17 support: Setting CTX_HAVE_CXX17")
-	LIST(APPEND CTX_DEFINITIONS "CTX_HAVE_CXX17")
+	set(CTX_HAVE_CXX17 ON)
 endif()
 
 ##################################
@@ -49,7 +45,7 @@ endif()
 ##################################
 if (NOT CTX_ENABLE_LIBCTX_COMPATIBILITY)
 	message(STATUS "Disabling full libctx compatibility.")
-	LIST(APPEND CTX_DEFINITIONS "DISABLE_LIBCTX_COMPATIBILITY")
+	set(DISABLE_LIBCTX_COMPATIBILITY ON)
 endif()
 
 ################################################

@@ -22,7 +22,11 @@
 // TEST_QCHEM_LIBCTX enables the sections for testing Q-Chem's libctx with this test suite
 // DISABLE_LIBCTX_COMPATIBILITY disables all compatibility and namespace remapping
 //                              from ctx to libctx.
-#if defined DISABLE_LIBCTX_COMPATIBILITY and not defined TEST_QCHEM_LIBCTX
+#if not defined TEST_QCHEM_LIBCTX
+#include "ctx/config.hh"
+#endif  // TEST_QCHEM_LIBCTX
+
+#if defined DISABLE_LIBCTX_COMPATIBILITY
 #include <ctx/ctx_ref.h>
 #else
 #include <libctx/ctx_ref.h>

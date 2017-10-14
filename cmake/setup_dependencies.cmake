@@ -25,10 +25,6 @@
 #       CTX_DEPENDENCIES_RELEASE		release mode needs these extras
 #       CTX_DEPENDENCIES_TEST			tests need these extra libraries
 #
-#       CTX_DEFINITIONS				definitions for all compilation
-#       CTX_DEFINITIONS_DEBUG			definitions for debug mode
-#       CTX_DEFINITIONS_RELEASE			definitions for release mode
-#
 
 ####################
 #-- Empty it all --#
@@ -37,9 +33,6 @@ set(CTX_DEPENDENCIES "")
 set(CTX_DEPENDENCIES_DEBUG "")
 set(CTX_DEPENDENCIES_RELEASE "")
 set(CTX_DEPENDENCIES_TEST "")
-set(CTX_DEFINITIONS "")
-set(CTX_DEFINITIONS_DEBUG "")
-set(CTX_DEFINITIONS_RELEASE "")
 
 #############
 #-- catch --#
@@ -52,13 +45,11 @@ endif()
 #############
 #-- krims --#
 #############
-# Find at least version 0.0.0
-set(KRIMS_VERSION 0.0.0)
-
 # By default disable tests and examples
 option(KRIMS_ENABLE_TESTS "Build krims tests" OFF)
 
-include(cmake/findKrims.cmake)
+include_krims_cmake_module(FindPackageAutocheckoutFallback)
+find_package_autocheckout_fallback(krims 0.1.0)
 foreach (build ${DRB_BUILD_TYPES})
 	set(CTX_DEPENDENCIES_${build} ${CTX_DEPENDENCIES_${build}} ${krims_${build}_TARGET})
 endforeach()

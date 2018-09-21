@@ -81,6 +81,7 @@ Other points to note:
   Since all changes done by either acting on the ``root_storage`` as well
   as the ``ctx::context`` effect the other object, both interfaces
   can be used simultaneously, e.g.
+  
   ```cpp
   krims::GenMap stor{{"bla", 5}};
   ctx::context ctx(stor);
@@ -90,6 +91,7 @@ Other points to note:
 
   std::cout << *ctx.get<int>("bla");
   ```
+  
   will print the value ``7`` which has been set via the ``stor`` object,
   i.e. the ``GenMap`` interface.
 - ``ctx::params`` objects contain a ``GenMap`` to store their data.

@@ -66,6 +66,8 @@ find_library(KRIMS_LIBRARY
 	krims${SUFFIX}
 	PATHS
 	${LIBCTX_DIR}/build/external/krims/src/krims
+	${ctx_SOURCE_DIR}/../krims/build/src/krims
+	${ctx_BINARY_DIR}/../krims/src/krims
 	${CMAKE_SOURCE_DIR}/../krims/build/src/krims
 	${CMAKE_BINARY_DIR}/../krims/src/krims
 )

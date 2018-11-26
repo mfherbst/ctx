@@ -139,11 +139,16 @@ TEST_CASE("PamMap tests", "[genmap]") {
     auto dptr = std::make_shared<double>(3.4);
     auto sptr = std::make_shared<DummyCopyable<double>>(dum);
 
+    std::vector<double> vals{1.2, 2.3};
+    auto cptr = std::make_shared<const std::vector<double>>(vals);
+
     m.update("double", dptr);
     m.update("shared", sptr);
+    m.update("const", cptr);
 
     REQUIRE(m.at<double>("double") == *dptr);
     REQUIRE(m.at<DummyCopyable<double>>("shared") == dum);
+    REQUIRE(m.at<const std::vector<double>>("const") == vals);
   }
 
   //

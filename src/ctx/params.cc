@@ -42,8 +42,8 @@ const params& params::get_subtree(const std::string& key) const {
 
   auto it = m_subtree_cache.find(normalise_key(key));
   if (it == std::end(m_subtree_cache)) {
-    throw runtime_error("Unexpectedly could not find key '" + key +
-                        "' in subtree cache'");
+    throw internal_error("Unexpectedly could not find key '" + key +
+                         "' in subtree cache'");
   }
   return it->second;
 }
@@ -93,8 +93,8 @@ std::ostream& operator<<(std::ostream& os, const params& p) {
     // We skip the leading /
 
     if (kv.key()[0] != '/') {
-      throw std::runtime_error("Unexpectedly encountered key '" + kv.key() +
-                               "'not starting with a '/'");
+      throw internal_error("Unexpectedly encountered key '" + kv.key() +
+                           "'not starting with a '/'");
     }
     for (auto it = std::begin(kv.key()) + 1; it != std::end(kv.key()); ++it) {
       if (*it == '/') {

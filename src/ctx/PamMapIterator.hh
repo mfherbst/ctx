@@ -119,7 +119,7 @@ std::string PamMapIterator<Const>::strip_location_prefix(const std::string& key)
   // The first part needs to be exactly the location:
   if (key.size() < m_location.size() ||
       0 != key.compare(0, m_location.size(), m_location)) {
-    throw runtime_error("key does not start with the expected location prefix.");
+    throw internal_error("key does not start with the expected location prefix.");
   }
 
   if (key.size() <= m_location.size()) {
@@ -129,7 +129,7 @@ std::string PamMapIterator<Const>::strip_location_prefix(const std::string& key)
 
     if (res.length() > 0) {
       if (res[0] != '/' || res.back() == '/') {
-        throw runtime_error(
+        throw internal_error(
               "strip_location_prefix did something unexpected: The key does not start "
               "with a / or "
               "it ends with a /");

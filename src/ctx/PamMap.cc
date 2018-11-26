@@ -75,7 +75,7 @@ void PamMap::update(const std::string& key, PamMap&& other) {
 std::string PamMap::make_full_key(const std::string& key) const {
   if (m_location.length() > 0) {
     if (m_location[0] != '/' || m_location.back() == '/') {
-      throw runtime_error(
+      throw internal_error(
             "Encountered unexpected key format: Keys passed to make_full_key should "
             "start with a /, but not end with a /.");
     }
@@ -119,7 +119,7 @@ std::string PamMap::make_full_key(const std::string& key) const {
 
   if (res.length() > 0) {
     if (res[0] != '/' || res.back() == '/') {
-      throw runtime_error(
+      throw internal_error(
             "make_full_key did something unexpected: The key does not start with a / or "
             "it ends with a /");
     }

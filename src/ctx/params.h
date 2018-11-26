@@ -208,7 +208,7 @@ template <typename T>
 T params::get(const std::string& key) const {
   T t;
   if (!(std::istringstream(get_str(key)) >> t)) {
-    throw runtime_error("Could not convert the value \"" + get_str(key) +
+    throw type_mismatch("Could not convert the value \"" + get_str(key) +
                         "\" for key \"" + key + "\" to the requested type.");
   }
   return t;
@@ -218,7 +218,7 @@ template <typename T>
 void params::set(const std::string& key, const T& val) {
   std::ostringstream ss;
   if (!(ss << val)) {
-    throw runtime_error("Could not convert the value for key \"" + key + "\" to string.");
+    throw type_mismatch("Could not convert the value for key \"" + key + "\" to string.");
   }
   set(key, ss.str());
 }
@@ -235,7 +235,7 @@ std::vector<T> params::get_vec(const std::string& key) const {
     T val;
     ss >> val >> std::ws;
     if (!ss) {
-      throw runtime_error("Could not convert the value \"" + get_str(key) +
+      throw type_mismatch("Could not convert the value \"" + get_str(key) +
                           "\" for key \"" + key + "\" to the requested type.");
     }
     ret.push_back(std::move(val));

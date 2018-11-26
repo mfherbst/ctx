@@ -31,4 +31,8 @@ struct type_mismatch : public invalid_argument {
   using invalid_argument::invalid_argument;
 };
 
+struct internal_error : public runtime_error {
+  using runtime_error::runtime_error;
+};
+
 }  // namespace ctx

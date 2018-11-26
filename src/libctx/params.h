@@ -19,15 +19,15 @@
 
 #pragma once
 
-#include "PamMap.hh"
-#include "exceptions.hh"
-#include "libctx_namespace.hh"
+#include <ctx/PamMap.hh>
+#include <ctx/exceptions.hh>
 #include <iostream>
 #include <map>
 #include <sstream>
 #include <vector>
 
-namespace ctx {
+namespace libctx {
+using namespace ctx;
 
 /** \brief Routine parameters
  *
@@ -242,4 +242,4 @@ std::vector<T> params::get_vec(const std::string& key) const {
   }
   return ret;
 }
-}  // namespace ctx
+}  // namespace libctx

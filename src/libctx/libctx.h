@@ -19,19 +19,8 @@
 
 #pragma once
 #include "context.h"
-
-namespace ctx {
-
-/** Class representing a pointer to an object in the context */
-template <typename T>
-class ctx_ptr {
- public:
-  ctx_ptr(context& ctx, const std::string& key) : m_ptr(ctx.get<T>(key)) {}
-  T& operator*() const { return *m_ptr; }
-  T* operator->() const { return m_ptr.get(); }
-
- private:
-  rc_ptr<T> m_ptr;
-};
-
-}  // namespace ctx
+#include "ctx_ptr.h"
+#include "ctx_ref.h"
+#include "params.h"
+#include "rc_ptr.h"
+#include "root_storage.h"

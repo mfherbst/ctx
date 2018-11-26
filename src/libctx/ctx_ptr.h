@@ -20,22 +20,18 @@
 #pragma once
 #include "context.h"
 
-namespace ctx {
+namespace libctx {
 
-/** Class representing a reference to an object in the context */
+/** Class representing a pointer to an object in the context */
 template <typename T>
-class ctx_ref {
+class ctx_ptr {
  public:
-  ctx_ref(context& ctx, const std::string& key) : m_ptr(ctx.get<T>(key)) {}
-
-  /** Implicit conversion to const T& */
-  operator const T&() const { return *m_ptr; }
-
-  /** Implicit conversion to T& */
-  operator T&() { return *m_ptr; }
+  ctx_ptr(context& ctx, const std::string& key) : m_ptr(ctx.get<T>(key)) {}
+  T& operator*() const { return *m_ptr; }
+  T* operator->() const { return m_ptr.get(); }
 
  private:
   rc_ptr<T> m_ptr;
 };
 
-}  // namespace ctx
+}  // namespace libctx

@@ -18,11 +18,13 @@
 //
 
 #pragma once
-#include "exceptions.hh"
 #include "rc_ptr.h"
 #include "root_storage.h"
+#include <ctx/exceptions.hh>
+#include <iostream>
+#include <vector>
 
-namespace ctx {
+namespace libctx {
 
 /** \brief context object which resembles the libctx::context
  *  object by Epifanovsky et. al.
@@ -38,11 +40,12 @@ class context {
   ///@{
   /** Create from root_storage, i.e. PamMap */
   context(root_storage& stor)
-        : m_map_ptr{std::make_shared<root_storage>(stor.submap(""))} {}
+        : m_map_ptr{std::make_shared<root_storage>(stor.submap(""))}, m_location{""} {}
 
   /** Create a subcontext of the referenced context */
   context(const context& ctx, const std::string& base)
-        : m_map_ptr{std::make_shared<root_storage>(ctx.m_map_ptr->submap(base))} {}
+        : m_map_ptr{std::make_shared<root_storage>(ctx.m_map_ptr->submap(base))},
+          m_location{ctx.m_location + "/" + base} {}
   ///@}
 
   /** \name Modify elements */
@@ -70,18 +73,13 @@ class context {
   }
 
   /** Erase a single element from the context */
-  void erase(const std::string& key) {
-    size_t count = m_map_ptr->erase(key);
-    if (count != 1) {
-      throw out_of_range("Key '" + key + "' is not known.");
-    }
-  }
+  void erase(const std::string& key);
 
   /** Erase a full path, i.e. all elements located under given path */
   void erase_path(const std::string& path) { m_map_ptr->erase_recursive(path); }
   ///@}
 
-  /** \name Obtain and copy elements */
+  /** \name Obtain, copy and move elements */
   ///@{
 
   /** Obtain an element from the context. */
@@ -104,16 +102,29 @@ class context {
    * In other words both ``key_from`` (in *this) and ``key_to``
    * (in ``to``) now point to the same object in memory
    */
-  void copy(const std::string& key_from, context& to, const std::string& key_to) {
-    if (m_map_ptr->exists(key_to)) {
-      throw invalid_argument("Target key '" + key_to + "' already exists.");
-    }
+  void copy(const std::string& key_from, context& to, const std::string& key_to);
+
+  /** Move an object from one key to another */
+  void move(const std::string& key_from, const std::string& key_to);
+
+  /** Move an object from one context to another */
+  void move(const std::string& key_from, context& to, const std::string& key_to) {
     to.m_map_ptr->update(key_to, m_map_ptr->at_raw_value(key_from));
+    m_map_ptr->erase(key_from);
   }
   ///@}
 
   /** If the key exists return true, else false */
   bool key_exists(const std::string& key) const { return m_map_ptr->exists(key); }
+
+  /** Return the current location of the context relative to the root storage */
+  const std::string& whereami() const { return m_location; }
+
+  /** Returns the vector of all keys that exist in the context */
+  void get_keys(std::vector<std::string>& keys) const;
+
+  /** Print the contents of the context to the output stream */
+  void print(std::ostream& os = std::cout) const;
 
   /** Return a reference to the PamMap used to store the values */
   PamMap& map() { return *m_map_ptr; }
@@ -123,6 +134,12 @@ class context {
 
  private:
   std::shared_ptr<root_storage> m_map_ptr;
+  std::string m_location;
 };
 
-}  // namespace ctx
+inline std::ostream& operator<<(std::ostream& o, context& c) {
+  o << c.map();
+  return o;
+}
+
+}  // namespace libctx

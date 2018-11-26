@@ -19,7 +19,7 @@
 
 #include "params.h"
 
-namespace ctx {
+namespace libctx {
 
 bool params::subtree_exists(const std::string& key) const {
   const std::string normalised = normalise_key(key);
@@ -110,4 +110,4 @@ std::ostream& operator<<(std::ostream& os, const params& p) {
   return os;
 }
 
-}  // namespace ctx
+}  // namespace libctx

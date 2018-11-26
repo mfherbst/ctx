@@ -35,6 +35,7 @@ include(${CATCH_DIR}/ParseAndAddCatchTests.cmake)
 # enable testing of this project
 enable_testing()
 
+include_directories("${ctx_SOURCE_DIR}/src")
 add_executable(ctx_tests ${CTX_TESTS_SOURCES})
 target_link_libraries(ctx_tests ctx Catch)
 ParseAndAddCatchTests(ctx_tests)

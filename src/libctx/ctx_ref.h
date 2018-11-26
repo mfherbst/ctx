@@ -19,9 +19,23 @@
 
 #pragma once
 #include "context.h"
-#include "ctx_ptr.h"
-#include "ctx_ref.h"
-#include "libctx_namespace.hh"
-#include "params.h"
-#include "rc_ptr.h"
-#include "root_storage.h"
+
+namespace libctx {
+
+/** Class representing a reference to an object in the context */
+template <typename T>
+class ctx_ref {
+ public:
+  ctx_ref(context& ctx, const std::string& key) : m_ptr(ctx.get<T>(key)) {}
+
+  /** Implicit conversion to const T& */
+  operator const T&() const { return *m_ptr; }
+
+  /** Implicit conversion to T& */
+  operator T&() { return *m_ptr; }
+
+ private:
+  rc_ptr<T> m_ptr;
+};
+
+}  // namespace libctx

@@ -18,10 +18,9 @@
 //
 
 #pragma once
-#include "libctx_namespace.hh"
 #include <memory>
 
-namespace ctx {
+namespace libctx {
 template <typename T>
 class rc_ptr : public std::shared_ptr<T> {
  public:
@@ -56,4 +55,4 @@ rc_ptr<T> make_rcptr(Args&&... args) {
   return std::make_shared<T>(std::forward<Args>(args)...);
 }
 
-}  // namespace ctx
+}  // namespace libctx

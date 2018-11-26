@@ -18,9 +18,9 @@
 //
 
 #pragma once
-#include "PamMap.hh"
-#include "libctx_namespace.hh"
+#include <ctx/PamMap.hh>
 
-namespace ctx {
+namespace libctx {
+using namespace ctx;
 using root_storage = PamMap;
-}  // namespace ctx
+}  // namespace libctx

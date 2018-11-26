@@ -20,12 +20,14 @@
 ## ---------------------------------------------------------------------
 
 set(CTX_SOURCES
-  demangle.cc
-  PamMapValue.cc
-  PamMap.cc
-  params.cc
+  ctx/demangle.cc
+  ctx/PamMapValue.cc
+  ctx/PamMap.cc
+  libctx/params.C
+  libctx/context.C
 )
 
+include_directories(${CMAKE_CURRENT_LIST_DIR})
 add_library(ctx ${CTX_SOURCES})
 set_target_properties(ctx PROPERTIES VERSION "${PROJECT_VERSION}")
 
@@ -41,18 +43,18 @@ install(TARGETS ctx
 )
 
 # install the includes:
-install(DIRECTORY .
+install(DIRECTORY ctx
 	DESTINATION "include/ctx"
 	COMPONENT devel
 	FILES_MATCHING
 	PATTERN "*.hh"
+)
+install(DIRECTORY libctx
+	DESTINATION "include/libctx"
+	COMPONENT devel
+	FILES_MATCHING
 	PATTERN "*.h"
 )
-
-# TODO note: The symlink include/libctx -> include/ctx is not
-#            generated, so one will not be able to use the installed
-#            files from code following the Q-Chem libctx setup convention
-#            at the moment.
 
 # Export the target specifications for ctx.
 export(EXPORT CtxTargets

@@ -50,11 +50,7 @@ endif()
 ##########################################################################
 # Subdirectories and targets
 
-# Global include directories for this project:
-include_directories("${ctx_SOURCE_DIR}/src")
-include_directories("${ctx_BINARY_DIR}/src")
-
-add_subdirectory(src/ctx)
+add_subdirectory(src)
 
 option(CTX_ENABLE_TESTS "Build ctx tests" ON)
 if(CTX_ENABLE_TESTS)

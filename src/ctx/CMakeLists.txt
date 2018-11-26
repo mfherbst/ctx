@@ -24,11 +24,7 @@ set(CTX_SOURCES
   PamMapValue.cc
   PamMap.cc
   params.cc
-  version.cc
 )
-
-# Write the config file config.hh
-configure_file("config.hh.in"  "config.hh")
 
 add_library(ctx ${CTX_SOURCES})
 set_target_properties(ctx PROPERTIES VERSION "${PROJECT_VERSION}")
@@ -51,10 +47,6 @@ install(DIRECTORY .
 	FILES_MATCHING
 	PATTERN "*.hh"
 	PATTERN "*.h"
-)
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/config.hh"
-	DESTINATION "include/ctx"
-	COMPONENT devel
 )
 
 # TODO note: The symlink include/libctx -> include/ctx is not

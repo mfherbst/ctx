@@ -18,24 +18,10 @@
 //
 
 #include <catch2/catch.hpp>
-
-// TEST_QCHEM_LIBCTX enables the sections for testing Q-Chem's libctx with this test suite
-// DISABLE_LIBCTX_COMPATIBILITY disables all compatibility and namespace remapping
-//                              from ctx to libctx.
-#if not defined TEST_QCHEM_LIBCTX
-#include "ctx/config.hh"
-#endif  // TEST_QCHEM_LIBCTX
-
-#if defined DISABLE_LIBCTX_COMPATIBILITY
-#include <ctx/ctx_ref.h>
-#else
 #include <libctx/ctx_ref.h>
-#endif
 
 namespace ctx {
-#ifndef DISABLE_LIBCTX_COMPATIBILITY
 using namespace libctx;
-#endif
 namespace tests {
 
 /** Dummy function to enforce conversion to a reference from ctx_ref classes */

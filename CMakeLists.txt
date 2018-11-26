@@ -54,15 +54,6 @@ endif()
 include_directories("${ctx_SOURCE_DIR}/src")
 include_directories("${ctx_BINARY_DIR}/src")
 
-option(CTX_ENABLE_LIBCTX_COMPATIBILITY
-	"Enable libctx compatibility mode. \
-If this is off, it is possible to use Q-Chem's libctx (via libctx namespace) \
-and this ctx library (via the ctx namespace) side-by-side." ON)
-if (NOT CTX_ENABLE_LIBCTX_COMPATIBILITY)
-	message(STATUS "Disabling full libctx compatibility.")
-	set(DISABLE_LIBCTX_COMPATIBILITY ON)
-endif()
-
 add_subdirectory(src/ctx)
 
 option(CTX_ENABLE_TESTS "Build ctx tests" ON)

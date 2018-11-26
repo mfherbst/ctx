@@ -45,9 +45,12 @@ I have thoroughly tested both ``ctx`` and ``libctx``
 using the unit test suite in this project and made
 sure that both libraries show the identical behaviour.
 Of cause there could be things I have missed, so
-please beware that ``ctx`` is *not exactly* ``libctx``.   
+please beware that ``ctx`` is *not exactly* ``libctx``.
+It should be noted, however, that *adcman* work with ``ctx``
+perfectly and has been used by myself in this way for
+quite some time now.  
 
-Other points to note:
+Other points to mention:
 - ``ctx`` and ``libctx`` largely have the same interface,
   but in order to simplify the implementation with the
   ``PamMap`` I decided to drop support for some stuff.
@@ -82,6 +85,10 @@ Other points to note:
   i.e. the ``PamMap`` interface.
 - ``ctx::params`` objects contain a ``PamMap`` to store their data.
   It can be referenced (and altered) using the ``map()`` function.
+- Thanks to the ``PamMap``, ``ctx::context`` objects can now be printed,
+  including the data types of the stored data and (for some data types)
+  even the values. This is implemented via the usual ``operator<<``
+  functionality.
 
 ### Testing Q-Chem's ``libctx`` against the ``ctx`` test suite
 It is possible to run the test suite of this library against Q-Chem's ``libctx`` library code.   

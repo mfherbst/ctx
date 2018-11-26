@@ -18,9 +18,9 @@
 //
 
 #pragma once
+#include "PamMap.hh"
 #include "libctx_namespace.hh"
-#include <krims/GenMap.hh>
 
 namespace ctx {
-typedef krims::GenMap root_storage;
+using root_storage = PamMap;
 }  // namespace ctx

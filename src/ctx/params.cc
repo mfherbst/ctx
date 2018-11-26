@@ -35,9 +35,23 @@ bool params::subtree_exists(const std::string& key) const {
   return false;
 }
 
+const params& params::get_subtree(const std::string& key) const {
+  if (!subtree_exists(key)) {
+    throw out_of_range("Subtree key  '" + key + "' is not known.");
+  }
+
+  auto it = m_subtree_cache.find(normalise_key(key));
+  if (it == std::end(m_subtree_cache)) {
+    throw runtime_error("Unexpectedly could not find key '" + key +
+                        "' in subtree cache'");
+  }
+  return it->second;
+}
+
 params& params::get_subtree(const std::string& key) {
-  assert_throw(key.find('/') == std::string::npos,
-               ExcInvalidKey("Key should not contain the \"/\" character."));
+  if (key.find('/') != std::string::npos) {
+    throw invalid_argument("Key should not contain the \"/\" character.");
+  }
   const std::string normalised = normalise_key(key);
 
   // If the subtree cache does not have the required params object for the subtree
@@ -45,7 +59,7 @@ params& params::get_subtree(const std::string& key) {
   auto it = m_subtree_cache.find(normalised);
   if (it == std::end(m_subtree_cache)) {
     // Create the new parameter object.
-    params p(krims::make_unique<krims::GenMap>(m_map_ptr->submap(normalised)));
+    params p(std::unique_ptr<PamMap>(new PamMap(m_map_ptr->submap(normalised))));
 
     // Move in inside the subtree
     auto it = m_subtree_cache.emplace(std::move(normalised), std::move(p)).first;
@@ -56,9 +70,12 @@ params& params::get_subtree(const std::string& key) {
 }
 
 params& params::merge_subtree(const std::string& key, const params& from) {
-  assert_throw(!key.empty(), ExcInvalidKey("An empty key is not allowed here."));
-  assert_throw(key.find('/') == std::string::npos,
-               ExcInvalidKey("Key should not contain the \"/\" character."));
+  if (key.empty()) {
+    throw invalid_argument("An empty key is not allowed here.");
+  }
+  if (key.find('/') != std::string::npos) {
+    throw invalid_argument("Key should not contain the \"/\" character.");
+  }
 
   // Perform a full deep copy of the from object
   // and move this copy into ourself.
@@ -75,7 +92,10 @@ std::ostream& operator<<(std::ostream& os, const params& p) {
     // we need to replace those characters here.
     // We skip the leading /
 
-    assert_dbg(kv.key()[0] == '/', krims::ExcInternalError());
+    if (kv.key()[0] != '/') {
+      throw std::runtime_error("Unexpectedly encountered key '" + kv.key() +
+                               "'not starting with a '/'");
+    }
     for (auto it = std::begin(kv.key()) + 1; it != std::end(kv.key()); ++it) {
       if (*it == '/') {
         os << delimiter;

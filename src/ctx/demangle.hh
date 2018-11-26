@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2017 by the ctx authors
+// Copyright (C) 2018 by the ctx authors
 //
 // This file is part of ctx.
 //
@@ -18,25 +18,21 @@
 //
 
 #pragma once
+#include <string>
+#include <typeinfo>
+
 namespace ctx {
-/* clang-format off */
+/** Return the demangled name of the C++ symbol represented by the argument
+ * as a std::string */
+std::string demangle(const char* mangled);
 
-//
-// Detail namespace
-//
-namespace detail {
-constexpr int version_major { @PROJECT_VERSION_MAJOR@ };
-constexpr int version_minor { @PROJECT_VERSION_MINOR@ };
-constexpr int version_patch { @PROJECT_VERSION_PATCH@ };
-}  // namespace detail
+/** Return the demangled name of the C++ symbol represented by the argument
+ * as a std::string */
+inline std::string demangle(const std::string& mangled_name) {
+  return demangle(mangled_name.c_str());
+}
 
-//
-// Definitions of features
-//
-#ifndef CXX_STANDARD
-#define CXX_STANDARD @CMAKE_CXX_STANDARD@
-#endif
-#cmakedefine DISABLE_LIBCTX_COMPATIBILITY
+/** Return the demangled typename of the type_info */
+inline std::string demangle(const std::type_info& type) { return demangle(type.name()); }
 
-/* clang-format on */
 }  // namespace ctx

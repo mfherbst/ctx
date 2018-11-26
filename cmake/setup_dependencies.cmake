@@ -35,14 +35,6 @@ set(CTX_DEPENDENCIES_RELEASE "")
 set(CTX_DEPENDENCIES_TEST "")
 
 #############
-#-- catch --#
-#############
-if (CTX_ENABLE_TESTS)
-	include(cmake/findCatch.cmake)
-	set(CTX_DEPENDENCIES_TEST ${CTX_DEPENDENCIES_TEST} ${catch_TARGET})
-endif()
-
-#############
 #-- krims --#
 #############
 # By default disable tests and examples

@@ -18,9 +18,9 @@
 //
 
 #pragma once
+#include "exceptions.hh"
 #include "rc_ptr.h"
 #include "root_storage.h"
-#include <krims/RCPWrapper.hh>
 
 namespace ctx {
 
@@ -28,22 +28,17 @@ namespace ctx {
  *  object by Epifanovsky et. al.
  *
  *  The purpose is to provide a libctx-like interface to our
- *  krims::GenMap, which is in fact typedefed to ``root_storage``.
+ *  PamMap, which is in fact typedefed to ``root_storage``.
  *
  *  We also use C++ 11 smart pointers instead of their rc_ptr objects.
  */
 class context {
  public:
-  /** Exception thrown if a key already exists */
-  DefException1(ExcExistingKey, std::string,
-                << "The key " << arg1
-                << " already exists in the context. Use update() to update the key.");
-  typedef krims::GenMap::ExcUnknownKey ExcUnknownKey;
-
   /** \name Constructors */
   ///@{
-  /** Create from root_storage, i.e. GenMap */
-  context(root_storage& stor) : m_map_ptr{krims::make_subscription(stor, "context")} {}
+  /** Create from root_storage, i.e. PamMap */
+  context(root_storage& stor)
+        : m_map_ptr{std::make_shared<root_storage>(stor.submap(""))} {}
 
   /** Create a subcontext of the referenced context */
   context(const context& ctx, const std::string& base)
@@ -57,7 +52,10 @@ class context {
    */
   template <typename T>
   void insert(const std::string& key, rc_ptr<T> ptr) {
-    assert_throw(!m_map_ptr->exists(key), ExcExistingKey(key));
+    if (m_map_ptr->exists(key)) {
+      throw invalid_argument("Key '" + key +
+                             "' already exists. Use update() to update its value.");
+    }
     m_map_ptr->update(key, ptr);
   }
 
@@ -65,14 +63,18 @@ class context {
    */
   template <typename T>
   void update(const std::string& key, rc_ptr<T> ptr) {
-    assert_throw(m_map_ptr->exists(key), ExcUnknownKey(key));
+    if (!m_map_ptr->exists(key)) {
+      throw out_of_range("Key '" + key + "' is not known.");
+    }
     m_map_ptr->update(key, ptr);
   }
 
   /** Erase a single element from the context */
   void erase(const std::string& key) {
     size_t count = m_map_ptr->erase(key);
-    assert_throw(count == 1, ExcUnknownKey(key));
+    if (count != 1) {
+      throw out_of_range("Key '" + key + "' is not known.");
+    }
   }
 
   /** Erase a full path, i.e. all elements located under given path */
@@ -103,7 +105,9 @@ class context {
    * (in ``to``) now point to the same object in memory
    */
   void copy(const std::string& key_from, context& to, const std::string& key_to) {
-    assert_throw(!to.m_map_ptr->exists(key_to), ExcExistingKey(key_to));
+    if (m_map_ptr->exists(key_to)) {
+      throw invalid_argument("Target key '" + key_to + "' already exists.");
+    }
     to.m_map_ptr->update(key_to, m_map_ptr->at_raw_value(key_from));
   }
   ///@}
@@ -111,14 +115,14 @@ class context {
   /** If the key exists return true, else false */
   bool key_exists(const std::string& key) const { return m_map_ptr->exists(key); }
 
-  /** Return a reference to the krims::GenMap used to store the values */
-  krims::GenMap& map() { return *m_map_ptr; }
+  /** Return a reference to the PamMap used to store the values */
+  PamMap& map() { return *m_map_ptr; }
 
-  /** Return a const reference to the krims::GenMap used to store the values */
-  const krims::GenMap& map() const { return *m_map_ptr; }
+  /** Return a const reference to the PamMap used to store the values */
+  const PamMap& map() const { return *m_map_ptr; }
 
  private:
-  krims::RCPWrapper<root_storage> m_map_ptr;
+  std::shared_ptr<root_storage> m_map_ptr;
 };
 
 }  // namespace ctx

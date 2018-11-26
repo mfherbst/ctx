@@ -20,6 +20,9 @@
 ## ---------------------------------------------------------------------
 
 set(CTX_SOURCES
+  demangle.cc
+  PamMapValue.cc
+  PamMap.cc
   params.cc
   version.cc
 )

@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2017 by the ctx authors
+// Copyright (C) 2018 by the ctx authors
 //
 // This file is part of ctx.
 //
@@ -18,25 +18,17 @@
 //
 
 #pragma once
+#include <exception>
+#include <stdexcept>
+
 namespace ctx {
-/* clang-format off */
 
-//
-// Detail namespace
-//
-namespace detail {
-constexpr int version_major { @PROJECT_VERSION_MAJOR@ };
-constexpr int version_minor { @PROJECT_VERSION_MINOR@ };
-constexpr int version_patch { @PROJECT_VERSION_PATCH@ };
-}  // namespace detail
+using std::invalid_argument;
+using std::out_of_range;
+using std::runtime_error;
 
-//
-// Definitions of features
-//
-#ifndef CXX_STANDARD
-#define CXX_STANDARD @CMAKE_CXX_STANDARD@
-#endif
-#cmakedefine DISABLE_LIBCTX_COMPATIBILITY
+struct type_mismatch : public invalid_argument {
+  using invalid_argument::invalid_argument;
+};
 
-/* clang-format on */
 }  // namespace ctx

@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2017 by the ctx authors
+// Copyright (C) 2018 by the ctx authors
 //
 // This file is part of ctx.
 //
@@ -17,26 +17,23 @@
 // along with ctx. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#pragma once
+#include "demangle.hh"
+#include <cstdlib>
+#include <cstring>
+#include <cxxabi.h>
+
 namespace ctx {
-/* clang-format off */
 
-//
-// Detail namespace
-//
-namespace detail {
-constexpr int version_major { @PROJECT_VERSION_MAJOR@ };
-constexpr int version_minor { @PROJECT_VERSION_MINOR@ };
-constexpr int version_patch { @PROJECT_VERSION_PATCH@ };
-}  // namespace detail
+std::string demangle(const char* mangled) {
+  int status;
+  char* demangled = abi::__cxa_demangle(mangled, nullptr, nullptr, &status);
 
-//
-// Definitions of features
-//
-#ifndef CXX_STANDARD
-#define CXX_STANDARD @CMAKE_CXX_STANDARD@
-#endif
-#cmakedefine DISABLE_LIBCTX_COMPATIBILITY
+  if (status == 0) {
+    std::string ret(demangled);
+    free(demangled);  // NOLINT
+    return ret;
+  }
+  return std::string(mangled);
+}
 
-/* clang-format on */
 }  // namespace ctx

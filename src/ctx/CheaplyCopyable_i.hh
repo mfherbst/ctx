@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2017 by the ctx authors
+// Copyright (C) 2018 by the ctx authors
 //
 // This file is part of ctx.
 //
@@ -19,24 +19,6 @@
 
 #pragma once
 namespace ctx {
-/* clang-format off */
-
-//
-// Detail namespace
-//
-namespace detail {
-constexpr int version_major { @PROJECT_VERSION_MAJOR@ };
-constexpr int version_minor { @PROJECT_VERSION_MINOR@ };
-constexpr int version_patch { @PROJECT_VERSION_PATCH@ };
-}  // namespace detail
-
-//
-// Definitions of features
-//
-#ifndef CXX_STANDARD
-#define CXX_STANDARD @CMAKE_CXX_STANDARD@
-#endif
-#cmakedefine DISABLE_LIBCTX_COMPATIBILITY
-
-/* clang-format on */
+/** Marker struct, which marks a class as cheaply copyable */
+struct CheaplyCopyable_i {};
 }  // namespace ctx

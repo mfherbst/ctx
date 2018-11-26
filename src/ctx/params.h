@@ -19,10 +19,10 @@
 
 #pragma once
 
+#include "PamMap.hh"
+#include "exceptions.hh"
 #include "libctx_namespace.hh"
 #include <iostream>
-#include <krims/GenMap.hh>
-#include <krims/make_unique.hh>
 #include <map>
 #include <sstream>
 #include <vector>
@@ -36,23 +36,14 @@ namespace ctx {
  */
 class params {
  public:
-  /** \name Exception definitions */
-  //@{
-  typedef krims::GenMap::ExcUnknownKey ExcUnknownKey;
-  DefException2(ExcConversionFailed, std::string, std::string,
-                << "Could not convert the value \"" << arg2 << "\" for key \"" << arg1
-                << "\" to the requested type");
-  DefException1(ExcInvalidKey, std::string, << "Invalid key encountered: " << arg1);
-  //@}
-
-  typedef krims::GenMap::const_iterator const_iterator;
+  typedef PamMap::const_iterator const_iterator;
 
   /**  \name Constructors */
   ///@{
   /**	\brief Create an empty parameter tree */
-  params() : m_map_ptr{krims::make_unique<krims::GenMap>()}, m_subtree_cache{} {}
+  params() : m_map_ptr{new PamMap{}}, m_subtree_cache{} {}
 
-  /** Create a deep copy of a krims::GenMap.
+  /** Create a deep copy of a PamMap.
    *
    * We copy all values, so the input GenMap and
    * the constructed object have no internal relationship
@@ -62,7 +53,7 @@ class params {
    *       i.e. all keys should map to a value type of
    *       std::string
    */
-  explicit params(const krims::GenMap& map) : params() {
+  explicit params(const PamMap& map) : params() {
     for (auto& kv : map) {
       m_map_ptr->update(kv.key(), kv.value<std::string>());
     }
@@ -108,12 +99,7 @@ class params {
    * Throws a ExcUnknownKey if the key does not refer
    * to a subtree
    **/
-  const params& get_subtree(const std::string& key) const {
-    assert_throw(subtree_exists(key), ExcUnknownKey(key));
-    auto it = m_subtree_cache.find(normalise_key(key));
-    assert_throw(it != std::end(m_subtree_cache), krims::ExcInternalError());
-    return it->second;
-  }
+  const params& get_subtree(const std::string& key) const;
 
   /** \brief Return a subtree.
    *
@@ -131,24 +117,21 @@ class params {
 
   /**  Convert the string value referenced by key to the requestet type ``T``
    *   and return the result.
-   *
-   *   If the conversion fails an ExcInvalidConversion is thrown.
    */
   template <typename T>
   T get(const std::string& key) const;
 
   ///@}
 
-  /** Set an entry. The value is converted to a string before setting it.
-   *
-   * If the conversion fails an ExcInvalidConversion is thrown. */
+  /** Set an entry. The value is converted to a string before setting it. */
   template <typename T>
   void set(const std::string& key, const T& value);
 
   /** Set an entry. */
   void set(const std::string& key, const std::string& value) {
-    assert_throw(key.find('/') == std::string::npos,
-                 ExcInvalidKey("Key should not contain the \"/\" character."));
+    if (key.find('/') != std::string::npos) {
+      throw invalid_argument("Key should not contain the \"/\" character.");
+    }
     m_map_ptr->update(key, value);
   }
 
@@ -161,13 +144,13 @@ class params {
    * as strings, so you will only able to get<std::string> from
    * the map.
    */
-  krims::GenMap& map() { return *m_map_ptr; }
+  PamMap& map() { return *m_map_ptr; }
 
   /** Get the underlying parameter map. (Const version)
    *
    * See non-const version above for details.
    */
-  const krims::GenMap& map() const { return *m_map_ptr; }
+  const PamMap& map() const { return *m_map_ptr; }
 
   /** Parse the value referred to by the key to a vector of
    *  arbitrary type and return it.
@@ -178,8 +161,6 @@ class params {
    *
    *  Missing keys are skipped, i.e. they do *not* throw an exception,
    *  but return an empty vector.
-   *
-   *  If the conversion fails an ExcConversionFailed exception is thrown.
    */
   template <typename T>
   std::vector<T> get_vec(const std::string& key) const;
@@ -187,8 +168,6 @@ class params {
   /** Parse the value referred to by the key to a vector of arbitrary type.
    *  The vector provided by reference is modified and the number of
    *  elements in the vector is returned.
-   *
-   *  If the conversion fails an ExcConversionFailed exception is thrown.
    */
   template <typename T>
   size_t get_vec(const std::string& key, std::vector<T>& vec) const {
@@ -207,7 +186,7 @@ class params {
  private:
   /** Internal constructor to make a params object from an already existent
    *  pointer to a  GenMap */
-  params(std::unique_ptr<krims::GenMap> map_ptr)
+  params(std::unique_ptr<PamMap> map_ptr)
         : m_map_ptr(std::move(map_ptr)), m_subtree_cache() {}
 
   std::string normalise_key(const std::string& raw_key) const {
@@ -215,7 +194,7 @@ class params {
   }
 
   //! The GenMap representing this tree. Contains only strings.
-  std::unique_ptr<krims::GenMap> m_map_ptr;
+  std::unique_ptr<PamMap> m_map_ptr;
 
   //! Cache for subtree objects.
   mutable std::map<std::string, params> m_subtree_cache;
@@ -228,15 +207,19 @@ class params {
 template <typename T>
 T params::get(const std::string& key) const {
   T t;
-  const bool fail = !(std::istringstream(get_str(key)) >> t);
-  assert_throw(!fail, ExcConversionFailed(key, get_str(key)));
+  if (!(std::istringstream(get_str(key)) >> t)) {
+    throw runtime_error("Could not convert the value \"" + get_str(key) +
+                        "\" for key \"" + key + "\" to the requested type.");
+  }
   return t;
 }
 
 template <typename T>
 void params::set(const std::string& key, const T& val) {
   std::ostringstream ss;
-  assert_throw(ss << val, ExcConversionFailed(key, "<conversion_error>"));
+  if (!(ss << val)) {
+    throw runtime_error("Could not convert the value for key \"" + key + "\" to string.");
+  }
   set(key, ss.str());
 }
 
@@ -251,7 +234,10 @@ std::vector<T> params::get_vec(const std::string& key) const {
   while (!ss.eof()) {
     T val;
     ss >> val >> std::ws;
-    assert_throw(ss, ExcConversionFailed(key, get_str(key)));
+    if (!ss) {
+      throw runtime_error("Could not convert the value \"" + get_str(key) +
+                          "\" for key \"" + key + "\" to the requested type.");
+    }
     ret.push_back(std::move(val));
   }
   return ret;

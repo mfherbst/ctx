@@ -37,7 +37,7 @@ drb_add_executable(ctx_tests
 )
 
 drb_target_link_libraries(ALL     ctx_tests
-	${CTX_DEPENDENCIES} ${CTX_DEPENDENCIES_TEST})
+	${CTX_DEPENDENCIES} ${catch_TARGET})
 drb_target_link_libraries(DEBUG   ctx_tests
 	${ctx_DEBUG_TARGET} ${CTX_DEPENDENCIES_DEBUG})
 drb_target_link_libraries(RELEASE ctx_tests
@@ -47,6 +47,9 @@ drb_target_link_libraries(RELEASE ctx_tests
 FOREACH(target ${ctx_tests_TARGETS})
 	add_test(NAME ${target} COMMAND ${target})
 ENDFOREACH()
+
+# enable testing of this project
+enable_testing()
 
 # Check wether we are supposed to check Q-Chem's libctx library
 # as well against our test suite

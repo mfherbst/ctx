@@ -65,7 +65,14 @@ class PamMapValue {
   template <typename T, typename = typename std::enable_if<!std::is_same<
                               PamMap, typename std::decay<T>::type>::value>::type>
   PamMapValue(std::shared_ptr<T> t_ptr)
-        : m_object_ptr{t_ptr}, m_type_name{typeid(T).name()} {}
+        : m_object_ptr(t_ptr), m_type_name(typeid(T).name()) {}
+
+  /** \brief Make a PamMapValue from a shared pointer */
+  template <typename T, typename = typename std::enable_if<!std::is_same<
+                              PamMap, typename std::decay<T>::type>::value>::type>
+  PamMapValue(std::shared_ptr<const T> t_ptr)
+        : m_object_ptr{std::const_pointer_cast<T>(t_ptr)},
+          m_type_name(typeid(const T).name()) {}
 
   /** Make an PamMapValue from an rvalue reference */
   template <typename T,

@@ -1,7 +1,6 @@
-#!/bin/bash
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2017 by the ctx authors
+## Copyright (C) 2018 by Michael F. Herbst
 ##
 ## This file is part of ctx.
 ##
@@ -20,20 +19,8 @@
 ##
 ## ---------------------------------------------------------------------
 
-if ! mkdir build; then
-	echo "Could not make build directory" >&2
-	exit 1
-fi
-cd build
+# Setup catch as target
+set(CATCH_DIR "${CMAKE_CURRENT_LIST_DIR}" CACHE INTERNAL "")
 
-# TODO Could switch on:
-#   - Release only
-#   - Machine speciffic optimisations
-#   - Shared library build
-cmake \
-       -DKRIMS_ENABLE_EXAMPLES=OFF \
-       "$@" -DAUTOCHECKOUT_MISSING_REPOS=ON \
-       -DBUILD_SHARED_LIBS=OFF \
-       -DCTX_ENABLE_LIBCTX_COMPATIBILITY=ON \
-       ..
-exit 0
+add_library(Catch INTERFACE)
+target_include_directories(Catch INTERFACE "${CATCH_DIR}/..")

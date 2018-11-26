@@ -1,5 +1,5 @@
 //
-// Copyright (C) {{YEAR}} by the {{PROJECT}} authors
+// Copyright (C) {{YEAR}} by Michael F. Herbst and contributers
 //
 // This file is part of {{PROJECT}}.
 //
@@ -19,8 +19,8 @@
 
 #pragma once
 
-namespace {{NAMESPACE}} {
+namespace {{PROJECT}} {
 
 {{CURSOR}}
 
-}  // namespace {{NAMESPACE}}
+}  // namespace {{PROJECT}}

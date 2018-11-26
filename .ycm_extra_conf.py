@@ -30,9 +30,7 @@ flags = [
     # instead of "-I"
     '-I', 'src',
     '-I', 'build/src',
-    '-isystem', 'external/krims/src',
-    '-isystem', 'build/external/krims/src',
-    '-isystem', 'build/external/catch/src/catchFromGit/include',
+    '-isystem', 'external',
     # Explicit clang includes:
     '-isystem', '/usr/lib/ycmd/clang_includes',
 ]

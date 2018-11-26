@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2018 by the ctx authors
+// Copyright (C) 2018 by Michael F. Herbst
 //
 // This file is part of ctx.
 //
@@ -157,9 +157,9 @@ typename PamMap::const_iterator PamMap::cend(const std::string& path) const {
 }
 
 std::ostream& operator<<(std::ostream& o, const PamMap& map) {
-  size_t maxlen = 0;
+  int maxlen = 0;
   for (auto& kv : map) {
-    maxlen = std::max(maxlen, kv.key().size());
+    maxlen = std::max(maxlen, static_cast<int>(kv.key().size()));
   }
 
   for (auto& kv : map) {

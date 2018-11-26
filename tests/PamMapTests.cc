@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2018 by the ctx authors.
+// Copyright (C) 2018 by Michael F. Herbst
 //
 // This file is part of ctx.
 //
@@ -17,7 +17,7 @@
 // along with ctx. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include <catch.hpp>
+#include <catch2/catch.hpp>
 #include <ctx/CheaplyCopyable_i.hh>
 #include <ctx/PamMap.hh>
 
@@ -450,12 +450,15 @@ TEST_CASE("PamMap tests", "[genmap]") {
     // Iterator over empty range:
     for (auto& kv : m.submap("blubba")) {
       REQUIRE(false);  // We should never get here, since range empty
+      (void)kv;
     }
     for (auto it = m.begin("blubba"); it != m.end("blubba"); ++it) {
       REQUIRE(false);  // We should never get here, since range empty
+      (void)it;
     }
     for (auto it = m.cbegin("blubba"); it != m.cend("blubba"); ++it) {
       REQUIRE(false);  // We should never get here, since range empty
+      (void)it;
     }
   }
 

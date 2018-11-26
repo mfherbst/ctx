@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2017 by the ctx authors
+## Copyright (C) 2018 by Michael F. Herbst and contributers
 ##
 ## This file is part of ctx.
 ##
@@ -30,24 +30,15 @@ set(CTX_SOURCES
 # Write the config file config.hh
 configure_file("config.hh.in"  "config.hh")
 
-# Add the libraries for Debug and Release builds:
-drb_add_library(ctx
-	DBGSUFFIX  ".g"
-	FILES ${CTX_SOURCES}
-)
+add_library(ctx ${CTX_SOURCES})
+set_target_properties(ctx PROPERTIES VERSION "${PROJECT_VERSION}")
 
-drb_set_target_properties(
-	ALL ctx
-	PROPERTIES
-	VERSION "${PROJECT_VERSION}"
-)
-
-drb_target_link_libraries(ALL     ctx ${CTX_DEPENDENCIES})
-drb_target_link_libraries(DEBUG   ctx ${CTX_DEPENDENCIES_DEBUG})
-drb_target_link_libraries(RELEASE ctx ${CTX_DEPENDENCIES_RELEASE})
+#
+# Installation
+#
 
 # set the installation property for these targets:
-install(TARGETS ${ctx_TARGETS}
+install(TARGETS ctx
 	EXPORT CtxTargets
 	DESTINATION lib
 	COMPONENT library
@@ -74,12 +65,30 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/config.hh"
 # Export the target specifications for ctx.
 export(EXPORT CtxTargets
 	FILE "${ctx_BINARY_DIR}/ctxTargets.cmake"
-	NAMESPACE Upstream::
+	NAMESPACE Ctx::
 )
 
 # and install them appropriately:
 install(EXPORT CtxTargets
 	FILE "ctxTargets.cmake"
-	NAMESPACE Upstream::
+	NAMESPACE Ctx::
 	DESTINATION "share/cmake/ctx"
+)
+
+# Write a basic version file for ctx
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+	"${ctx_BINARY_DIR}/ctxConfigVersion.cmake"
+	COMPATIBILITY AnyNewerVersion
+)
+
+file(WRITE "${ctx_BINARY_DIR}/ctxConfig.cmake"
+	"include(\"${CMAKE_CURRENT_LIST_DIR}/ctxTargets.cmake\")")
+
+# Set an export location:
+install(FILES
+	"${ctx_BINARY_DIR}/ctxConfig.cmake"
+	"${ctx_BINARY_DIR}/ctxConfigVersion.cmake"
+	DESTINATION "share/cmake/ctx"
+	COMPONENT devel
 )

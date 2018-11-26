@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2017 by the ctx authors
+// Copyright (C) 2018 by Michael F. Herbst
 //
 // This file is part of ctx.
 //
@@ -17,7 +17,7 @@
 // along with ctx. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include <catch.hpp>
+#include <catch2/catch.hpp>
 
 // TEST_QCHEM_LIBCTX enables the sections for testing Q-Chem's libctx with this test suite
 // DISABLE_LIBCTX_COMPATIBILITY disables all compatibility and namespace remapping

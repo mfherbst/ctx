@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2018 by the ctx authors
+// Copyright (C) 2018 by Michael F. Herbst
 //
 // This file is part of ctx.
 //

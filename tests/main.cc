@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2017 by the ctx authors
+// Copyright (C) 2018 by Michael F. Herbst
 //
 // This file is part of ctx.
 //
@@ -17,28 +17,5 @@
 // along with ctx. If not, see <http://www.gnu.org/licenses/>.
 //
 
-// TEST_QCHEM_LIBCTX enables the sections for testing
-// Q-Chem's libctx with this test suite
-#ifndef TEST_QCHEM_LIBCTX
-// Setup the krims exception system for the tests.
-#define KRIMS_INIT_EXCEPTION_SYSTEM
-#include <krims/ExceptionSystem.hh>
-
-#include <krims/NumComp.hh>
-#endif  // TEST_QCHEM_LIBCTX
-
-#define CATCH_CONFIG_RUNNER
-#include <catch.hpp>
-
-int main(int argc, char* const argv[]) {
-#ifndef TEST_QCHEM_LIBCTX
-  // Throw in case a numerical comparison fails with very
-  // detailed information
-  krims::NumCompConstants::default_failure_action =
-        krims::NumCompActionType::ThrowVerbose;
-#endif
-
-  // Run catch:
-  int result = Catch::Session().run(argc, argv);
-  return result;
-}
+#define CATCH_CONFIG_MAIN
+#include <catch2/catch.hpp>

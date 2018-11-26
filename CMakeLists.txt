@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2017 by the ctx authors
+## Copyright (C) 2018 by Michael F. Herbst
 ##
 ## This file is part of ctx.
 ##
@@ -22,49 +22,38 @@
 cmake_minimum_required(VERSION 3.2.0)
 cmake_policy(VERSION 3.2.0)
 
-# Load the DebugReleaseBuild module for a simultaneous Debug and Release
-# and release build and initialise it.
-include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/IncludeKrimsCmakeModule.cmake")
-include_krims_cmake_module(DebugReleaseBuild)
-drb_init()
-
 ##########################################################################
 # Project setup
 
-# enable the new version feature introduced in cmake 3.0.0
-cmake_policy(SET CMP0048 NEW)
 project(ctx VERSION 2.1.0)
 message("\n# Configuring ${PROJECT_NAME}\n#")
 
-# Global include directories for this project:
-include_directories("${ctx_SOURCE_DIR}/src")
-include_directories("${ctx_BINARY_DIR}/src")
-
-##########################################################################
-# Setup hard and optional dependencies and find components
-
-# Determine and setup compiler flags, enforcing C++11
-drb_setup_compiler_flags(11)
-# set(CMAKE_CXX_STANDARD 11)
-# set(CMAKE_CXX_STANDARD_REQUIRED ON)
-# set(CMAKE_CXX_EXTENSIONS OFF)
-
-# Export compile commands if cmake supports it.
 if (CMAKE_VERSION VERSION_GREATER 3.5.0)
 	set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 endif()
+
+##########################################################################
+# Setup compiler flags
+
+# C++ standard of this project is 11
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+include(cmake/SetupCompiler.cmake)
 
 include(cmake/CheckCxxAbi.cmake)
 if (NOT HAVE_CXX_ABI)
 	message(FATAL_ERROR "C++ ABI header is required.")
 endif()
 
-# setup hard dependencies
-include(cmake/setup_dependencies.cmake)
-
-
 ##########################################################################
-# Source
+# Subdirectories and targets
+
+# Global include directories for this project:
+include_directories("${ctx_SOURCE_DIR}/src")
+include_directories("${ctx_BINARY_DIR}/src")
+
 option(CTX_ENABLE_LIBCTX_COMPATIBILITY
 	"Enable libctx compatibility mode. \
 If this is off, it is possible to use Q-Chem's libctx (via libctx namespace) \
@@ -73,14 +62,12 @@ if (NOT CTX_ENABLE_LIBCTX_COMPATIBILITY)
 	message(STATUS "Disabling full libctx compatibility.")
 	set(DISABLE_LIBCTX_COMPATIBILITY ON)
 endif()
+
 add_subdirectory(src/ctx)
 
-##########################################################################
-# Tests
 option(CTX_ENABLE_TESTS "Build ctx tests" ON)
 if(CTX_ENABLE_TESTS)
-	# TODO do this by plain downloading
-	include(cmake/findCatch.cmake)
+	add_subdirectory(external/catch2)
 
 	option(TEST_QCHEM_LIBCTX "Build and test Q-Chems libctx library." OFF)
 	if (TEST_QCHEM_LIBCTX)
@@ -91,8 +78,4 @@ if(CTX_ENABLE_TESTS)
 endif()
 
 ##########################################################################
-# Finally install package:
-include(cmake/install_package.cmake)
-
-# and print a closing message
 message("#\n# Configuring ${PROJECT_NAME} done\n")

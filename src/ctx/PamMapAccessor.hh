@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2018 by the ctx authors
+// Copyright (C) 2018 by Michael F. Herbst
 //
 // This file is part of ctx.
 //
@@ -37,8 +37,6 @@ class PamMapAccessor<true> {
 
   /** Return the type name of the value object referred to by the key, which
    * is held in this accessor.
-   *
-   * The type_name is only sensible in DEBUG mode.
    */
   std::string type_name() const { return m_value.type_name(); }
 

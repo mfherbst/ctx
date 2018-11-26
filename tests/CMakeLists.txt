@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2017 by the ctx authors
+## Copyright (C) 2018 by Michael F. Herbst
 ##
 ## This file is part of ctx.
 ##
@@ -19,10 +19,9 @@
 ##
 ## ---------------------------------------------------------------------
 
-#
 # The sources for the test executable
-#
 set(CTX_TESTS_SOURCES
+	PamMapTests.cc
 	contextTests.cc
 	ctx_ptrTests.cc
 	ctx_refTests.cc
@@ -30,26 +29,15 @@ set(CTX_TESTS_SOURCES
 	main.cc
 )
 
-drb_add_executable(ctx_tests
-	DBGSUFFIX  "_DEBUG"
-	RELSUFFIX  "_RELEASE"
-	FILES ${CTX_TESTS_SOURCES}
-)
-
-drb_target_link_libraries(ALL     ctx_tests
-	${CTX_DEPENDENCIES} ${catch_TARGET})
-drb_target_link_libraries(DEBUG   ctx_tests
-	${ctx_DEBUG_TARGET} ${CTX_DEPENDENCIES_DEBUG})
-drb_target_link_libraries(RELEASE ctx_tests
-	${ctx_RELEASE_TARGET} ${CTX_DEPENDENCIES_RELEASE})
-
-# Add the test executables to the test suite
-FOREACH(target ${ctx_tests_TARGETS})
-	add_test(NAME ${target} COMMAND ${target})
-ENDFOREACH()
+# Module to setup catch test targets
+include(${CATCH_DIR}/ParseAndAddCatchTests.cmake)
 
 # enable testing of this project
 enable_testing()
+
+add_executable(ctx_tests ${CTX_TESTS_SOURCES})
+target_link_libraries(ctx_tests ctx Catch)
+ParseAndAddCatchTests(ctx_tests)
 
 # Check wether we are supposed to check Q-Chem's libctx library
 # as well against our test suite
@@ -63,7 +51,7 @@ if(TEST_QCHEM_LIBCTX)
 	target_compile_definitions(qchem_libctx_tests PRIVATE "TEST_QCHEM_LIBCTX")
 	set_target_properties(qchem_libctx_tests PROPERTIES INCLUDE_DIRECTORIES "")
 	target_link_libraries(qchem_libctx_tests
-		${qchem_libctx_target} ${CTX_DEPENDENCIES_TEST})
+		${qchem_libctx_target} Catch)
 
 	# Add to test list
 	add_test(NAME qchem_libctx_tests COMMAND qchem_libctx_tests)

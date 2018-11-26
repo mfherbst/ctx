@@ -44,13 +44,13 @@ install(TARGETS ctx
 
 # install the includes:
 install(DIRECTORY ctx
-	DESTINATION "include/ctx"
+	DESTINATION include
 	COMPONENT devel
 	FILES_MATCHING
 	PATTERN "*.hh"
 )
 install(DIRECTORY libctx
-	DESTINATION "include/libctx"
+	DESTINATION include
 	COMPONENT devel
 	FILES_MATCHING
 	PATTERN "*.h"

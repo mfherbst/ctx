@@ -59,7 +59,7 @@ params& params::get_subtree(const std::string& key) {
   auto it = m_subtree_cache.find(normalised);
   if (it == std::end(m_subtree_cache)) {
     // Create the new parameter object.
-    params p(std::unique_ptr<PamMap>(new PamMap(m_map_ptr->submap(normalised))));
+    params p(std::unique_ptr<CtxMap>(new CtxMap(m_map_ptr->submap(normalised))));
 
     // Move in inside the subtree
     auto it = m_subtree_cache.emplace(std::move(normalised), std::move(p)).first;

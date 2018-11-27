@@ -54,6 +54,8 @@ add_subdirectory(src)
 
 option(CTX_ENABLE_TESTS "Build ctx tests" ON)
 if(CTX_ENABLE_TESTS)
+	enable_testing()
+
 	add_subdirectory(external/catch2)
 
 	option(TEST_QCHEM_LIBCTX "Build and test Q-Chems libctx library." OFF)

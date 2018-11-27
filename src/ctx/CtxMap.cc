@@ -17,18 +17,18 @@
 // along with ctx. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include "PamMap.hh"
+#include "CtxMap.hh"
 #include <iomanip>
 #include <vector>
 
 namespace ctx {
-PamMap& PamMap::operator=(PamMap other) {
+CtxMap& CtxMap::operator=(CtxMap other) {
   m_location      = std::move(other.m_location);
   m_container_ptr = std::move(other.m_container_ptr);
   return *this;
 }
 
-PamMap::PamMap(const PamMap& other) : PamMap() {
+CtxMap::CtxMap(const CtxMap& other) : CtxMap() {
   if (other.m_location == std::string("")) {
     // We are root, copy everything
     m_container_ptr = std::make_shared<map_type>(*other.m_container_ptr);
@@ -37,14 +37,14 @@ PamMap::PamMap(const PamMap& other) : PamMap() {
   }
 }
 
-void PamMap::update(std::initializer_list<entry_type> il) {
+void CtxMap::update(std::initializer_list<entry_type> il) {
   // Make each key a full path key and append/modify entry in map
   for (entry_type t : il) {
     (*m_container_ptr)[make_full_key(t.first)] = std::move(t.second);
   }
 }
 
-void PamMap::clear() {
+void CtxMap::clear() {
   if (m_location == std::string("")) {
     // We are root, clear everything
     m_container_ptr->clear();
@@ -54,7 +54,7 @@ void PamMap::clear() {
   }
 }
 
-void PamMap::update(const std::string& key, const PamMap& other) {
+void CtxMap::update(const std::string& key, const CtxMap& other) {
   for (auto it = other.begin(); it != other.end(); ++it) {
     // The iterator truncates the other key relative to the builtin
     // location of other for us. We then make it full for our location
@@ -63,7 +63,7 @@ void PamMap::update(const std::string& key, const PamMap& other) {
   }
 }
 
-void PamMap::update(const std::string& key, PamMap&& other) {
+void CtxMap::update(const std::string& key, CtxMap&& other) {
   for (auto it = other.begin(); it != other.end(); ++it) {
     // The iterator truncates the other key relative to the builtin
     // location of other for us. We then make it full for our location
@@ -72,7 +72,7 @@ void PamMap::update(const std::string& key, PamMap&& other) {
   }
 }
 
-std::string PamMap::make_full_key(const std::string& key) const {
+std::string CtxMap::make_full_key(const std::string& key) const {
   if (m_location.length() > 0) {
     if (m_location[0] != '/' || m_location.back() == '/') {
       throw internal_error(
@@ -128,7 +128,7 @@ std::string PamMap::make_full_key(const std::string& key) const {
   return res;
 }
 
-typename PamMap::iterator PamMap::begin(const std::string& path) {
+typename CtxMap::iterator CtxMap::begin(const std::string& path) {
   // Obtain iterator to the first key-value pair, which has a
   // key starting with the full path.
   //
@@ -139,24 +139,24 @@ typename PamMap::iterator PamMap::begin(const std::string& path) {
   return iterator(starting_keys_begin(*m_container_ptr, path_full), path_full);
 }
 
-typename PamMap::const_iterator PamMap::cbegin(const std::string& path) const {
+typename CtxMap::const_iterator CtxMap::cbegin(const std::string& path) const {
   const std::string path_full = make_full_key(path);
   return const_iterator(starting_keys_begin(*m_container_ptr, path_full), path_full);
 }
 
-typename PamMap::iterator PamMap::end(const std::string& path) {
+typename CtxMap::iterator CtxMap::end(const std::string& path) {
   // Obtain the first key which does no longer start with the pull path,
   // i.e. where we are done processing the subpath.
   const std::string path_full = make_full_key(path);
   return iterator(starting_keys_end(*m_container_ptr, path_full), path_full);
 }
 
-typename PamMap::const_iterator PamMap::cend(const std::string& path) const {
+typename CtxMap::const_iterator CtxMap::cend(const std::string& path) const {
   const std::string path_full = make_full_key(path);
   return const_iterator(starting_keys_end(*m_container_ptr, path_full), path_full);
 }
 
-std::ostream& operator<<(std::ostream& o, const PamMap& map) {
+std::ostream& operator<<(std::ostream& o, const CtxMap& map) {
   int maxlen = 0;
   for (auto& kv : map) {
     maxlen = std::max(maxlen, static_cast<int>(kv.key().size()));

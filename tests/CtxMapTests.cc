@@ -19,7 +19,7 @@
 
 #include <catch2/catch.hpp>
 #include <ctx/CheaplyCopyable_i.hh>
-#include <ctx/PamMap.hh>
+#include <ctx/CtxMap.hh>
 
 namespace ctx {
 namespace tests {
@@ -37,16 +37,16 @@ struct DummyCopyable : public CheaplyCopyable_i, std::array<T, 4> {
 };
 }  // namespace genmap_tests
 
-TEST_CASE("PamMap tests", "[genmap]") {
+TEST_CASE("CtxMap tests", "[genmap]") {
   using namespace genmap_tests;
   // Some data:
   int i = 5;
   std::string s{"test"};
   DummyCopyable<double> dum{1.0, 2.0, 3.0, 4.0};
 
-  SECTION("Can add data to PamMap") {
+  SECTION("Can add data to CtxMap") {
     // Insert some data into a map.
-    PamMap m{};
+    CtxMap m{};
     m.update_copy("string", s);
     m.update_copy("integer", i);
     m.update_copy("dummy", dum);
@@ -63,7 +63,7 @@ TEST_CASE("PamMap tests", "[genmap]") {
 
   SECTION("Check that type safety is assured") {
     // Add data to map.
-    PamMap m{};
+    CtxMap m{};
     m.update_copy("s", s);
     m.update_copy("i", i);
     m.update_copy("dum", dum);
@@ -82,7 +82,7 @@ TEST_CASE("PamMap tests", "[genmap]") {
 
   SECTION("Check for UnknownKey") {
     // Add data to map.
-    PamMap m{};
+    CtxMap m{};
     m.update_copy("i", i);
 
     REQUIRE_THROWS_AS(m.at<bool>("blubber"), out_of_range);
@@ -96,7 +96,7 @@ TEST_CASE("PamMap tests", "[genmap]") {
 
   SECTION("Check for Getting the shared pointer back.") {
     // Add data to map.
-    PamMap m{};
+    CtxMap m{};
     m.update_copy("string", s);
     m.update_copy("integer", i);
     m.update_copy("dum", dum);
@@ -117,7 +117,7 @@ TEST_CASE("PamMap tests", "[genmap]") {
   //
 
   SECTION("Test update from cheaply copyable data.") {
-    PamMap m;
+    CtxMap m;
     double d = 3.4;
     m.update("double", d);
     m.update("noref", 3.141592);
@@ -135,7 +135,7 @@ TEST_CASE("PamMap tests", "[genmap]") {
   //
 
   SECTION("Test update for various pointer types.") {
-    PamMap m;
+    CtxMap m;
     auto dptr = std::make_shared<double>(3.4);
     auto sptr = std::make_shared<DummyCopyable<double>>(dum);
 
@@ -156,13 +156,13 @@ TEST_CASE("PamMap tests", "[genmap]") {
   //
 
   SECTION("Test retrieving data from const maps") {
-    PamMap m;
+    CtxMap m;
     m.update("double", 1.24);
     m.update("noref", 3.141592);
     m.update("word", "some");
     m.update("dum", dum);
 
-    const PamMap& mref{m};
+    const CtxMap& mref{m};
     REQUIRE(mref.at<double>("double") == 1.24);
     REQUIRE(mref.at<double>("noref") == 3.141592);
     REQUIRE(mref.at<std::string>("word") == "some");
@@ -174,7 +174,7 @@ TEST_CASE("PamMap tests", "[genmap]") {
   //
 
   SECTION("Test at with default return") {
-    PamMap m;
+    CtxMap m;
     m.update("string", s);
     m.update("integer", i);
 
@@ -192,7 +192,7 @@ TEST_CASE("PamMap tests", "[genmap]") {
   //
 
   SECTION("Test construction from initialiser list") {
-    PamMap m{{"value1", 1}, {"word", "a"}, {"integer", i}, {"string", s}, {"dum", dum}};
+    CtxMap m{{"value1", 1}, {"word", "a"}, {"integer", i}, {"string", s}, {"dum", dum}};
 
     REQUIRE(m.at<int>("value1") == 1);
     REQUIRE(m.at<std::string>("word") == "a");
@@ -206,7 +206,7 @@ TEST_CASE("PamMap tests", "[genmap]") {
   //
 
   SECTION("Test insert_default") {
-    const PamMap m{{"double", 3.4}, {"pi", 3.141592}};
+    const CtxMap m{{"double", 3.4}, {"pi", 3.141592}};
     REQUIRE(m.at<double>("double") == 3.4);
     REQUIRE(m.at<double>("pi") == 3.141592);
 
@@ -226,7 +226,7 @@ TEST_CASE("PamMap tests", "[genmap]") {
 
   SECTION("Check basic path transformations") {
     // Add data to map.
-    PamMap m{};
+    CtxMap m{};
     m.update("one/two/three", "3");
     m.update("three/two/one", 4);
     m.update("", "test");
@@ -262,7 +262,7 @@ TEST_CASE("PamMap tests", "[genmap]") {
   //
 
   SECTION("Check that data can be erased") {
-    PamMap m{};
+    CtxMap m{};
 
     REQUIRE_FALSE(m.exists("bla"));
 
@@ -334,7 +334,7 @@ TEST_CASE("PamMap tests", "[genmap]") {
 
   SECTION("Check submap functionality") {
     // Add data to map.
-    PamMap m{{"tree/sub", s},   {"tree/i", i},    {"dum", dum},
+    CtxMap m{{"tree/sub", s},   {"tree/i", i},    {"dum", dum},
              {"tree/value", 9}, {"tree", "root"}, {"/", "god"}};
 
     // check it is there:
@@ -345,7 +345,7 @@ TEST_CASE("PamMap tests", "[genmap]") {
     REQUIRE(m.exists("dum"));
     REQUIRE(m.exists("/"));
 
-    PamMap sub = m.submap("tree");
+    CtxMap sub = m.submap("tree");
 
     // Check existence:
     REQUIRE_FALSE(sub.exists("tree/sub"));
@@ -374,7 +374,7 @@ TEST_CASE("PamMap tests", "[genmap]") {
     REQUIRE(m.at<int>("tree/value") == 10);
 
     // Check path normalisation for submap:
-    PamMap sub2 = m.submap("/./tree/.");
+    CtxMap sub2 = m.submap("/./tree/.");
     REQUIRE(sub2.at<std::string>("sub") == s);
     REQUIRE(sub2.at<int>("i") == i);
     REQUIRE(sub2.at<int>("value") == 10);
@@ -395,7 +395,7 @@ TEST_CASE("PamMap tests", "[genmap]") {
 
   SECTION("Check iterators with begin() and end()") {
     // Add data to map.
-    PamMap m{{"tree/sub", s},  {"tree/i", i}, {"dum", dum},    {"tree/value", 9},
+    CtxMap m{{"tree/sub", s},  {"tree/i", i}, {"dum", dum},    {"tree/value", 9},
              {"tree", "root"}, {"/", "god"},  {"/zzz", "end"}, {"/zz", "mend"}};
 
     // Check we get all keys for starters:
@@ -417,7 +417,7 @@ TEST_CASE("PamMap tests", "[genmap]") {
     CHECK(itref == std::end(ref));
 
     // Get a submap:
-    PamMap sub = m.submap("tree");
+    CtxMap sub = m.submap("tree");
 
     // Check we get all keys of the submap:
     std::vector<std::string> subref{"/", "/i", "/sub", "/value"};
@@ -473,8 +473,8 @@ TEST_CASE("PamMap tests", "[genmap]") {
 
   SECTION("Check accessor interface of the iterator") {
     const double pi = 3.14159265;
-    PamMap map;
-    const PamMap& cmap(map);
+    CtxMap map;
+    const CtxMap& cmap(map);
 
     // Add a bunch of ints and  doubles
     for (int i = 0; i < 9; ++i) {
@@ -525,14 +525,14 @@ TEST_CASE("PamMap tests", "[genmap]") {
 
   SECTION("Check that copying submaps works.") {
     // Add data to map.
-    PamMap m{{"tree/sub", s},   {"tree/i", i},    {"dum", dum},
+    CtxMap m{{"tree/sub", s},   {"tree/i", i},    {"dum", dum},
              {"tree/value", 9}, {"tree", "root"}, {"/", "god"}};
 
     // Get a submap:
-    const PamMap sub = m.submap("/tree");
+    const CtxMap sub = m.submap("/tree");
 
     // Copy it:
-    PamMap copy = sub;
+    CtxMap copy = sub;
 
     // Check existence:
     REQUIRE_FALSE(copy.exists("tree/sub"));
@@ -570,19 +570,19 @@ TEST_CASE("PamMap tests", "[genmap]") {
 
   SECTION("Check that updating from other maps works.") {
     // Add data to map.
-    PamMap m{{"tree/sub", s},   {"tree/i", i},    {"dum", dum},
+    CtxMap m{{"tree/sub", s},   {"tree/i", i},    {"dum", dum},
              {"tree/value", 9}, {"tree", "root"}, {"/", "god"}};
 
     // Make a second map
-    PamMap n{{"house/window", true},
+    CtxMap n{{"house/window", true},
              {"house/open", "14-15"},
              {"garden", false},
              {"blubber", "blabla"},
              {"house/value", 14}};
 
     // Make submaps:
-    PamMap subm = m.submap("tree");
-    PamMap subn = n.submap("house");
+    CtxMap subm = m.submap("tree");
+    CtxMap subn = n.submap("house");
 
     CHECK(subn.at<bool>("window"));
     CHECK(subn.at<std::string>("open") == "14-15");

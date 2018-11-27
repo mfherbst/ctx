@@ -21,7 +21,7 @@
 
 # The sources for the test executable
 set(CTX_TESTS_SOURCES
-	PamMapTests.cc
+	CtxMapTests.cc
 	contextTests.cc
 	ctx_ptrTests.cc
 	ctx_refTests.cc
@@ -31,9 +31,6 @@ set(CTX_TESTS_SOURCES
 
 # Module to setup catch test targets
 include(${CATCH_DIR}/ParseAndAddCatchTests.cmake)
-
-# enable testing of this project
-enable_testing()
 
 include_directories("${ctx_SOURCE_DIR}/src")
 add_executable(ctx_tests ${CTX_TESTS_SOURCES})

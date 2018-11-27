@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include <ctx/PamMap.hh>
+#include <ctx/CtxMap.hh>
 #include <ctx/exceptions.hh>
 #include <iostream>
 #include <map>
@@ -36,14 +36,14 @@ using namespace ctx;
  */
 class params {
  public:
-  typedef PamMap::const_iterator const_iterator;
+  typedef CtxMap::const_iterator const_iterator;
 
   /**  \name Constructors */
   ///@{
   /**	\brief Create an empty parameter tree */
-  params() : m_map_ptr{new PamMap{}}, m_subtree_cache{} {}
+  params() : m_map_ptr{new CtxMap{}}, m_subtree_cache{} {}
 
-  /** Create a deep copy of a PamMap.
+  /** Create a deep copy of a CtxMap.
    *
    * We copy all values, so the input GenMap and
    * the constructed object have no internal relationship
@@ -53,7 +53,7 @@ class params {
    *       i.e. all keys should map to a value type of
    *       std::string
    */
-  explicit params(const PamMap& map) : params() {
+  explicit params(const CtxMap& map) : params() {
     for (auto& kv : map) {
       m_map_ptr->update(kv.key(), kv.value<std::string>());
     }
@@ -144,13 +144,13 @@ class params {
    * as strings, so you will only able to get<std::string> from
    * the map.
    */
-  PamMap& map() { return *m_map_ptr; }
+  CtxMap& map() { return *m_map_ptr; }
 
   /** Get the underlying parameter map. (Const version)
    *
    * See non-const version above for details.
    */
-  const PamMap& map() const { return *m_map_ptr; }
+  const CtxMap& map() const { return *m_map_ptr; }
 
   /** Parse the value referred to by the key to a vector of
    *  arbitrary type and return it.
@@ -186,7 +186,7 @@ class params {
  private:
   /** Internal constructor to make a params object from an already existent
    *  pointer to a  GenMap */
-  params(std::unique_ptr<PamMap> map_ptr)
+  params(std::unique_ptr<CtxMap> map_ptr)
         : m_map_ptr(std::move(map_ptr)), m_subtree_cache() {}
 
   std::string normalise_key(const std::string& raw_key) const {
@@ -194,7 +194,7 @@ class params {
   }
 
   //! The GenMap representing this tree. Contains only strings.
-  std::unique_ptr<PamMap> m_map_ptr;
+  std::unique_ptr<CtxMap> m_map_ptr;
 
   //! Cache for subtree objects.
   mutable std::map<std::string, params> m_subtree_cache;

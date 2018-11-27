@@ -18,19 +18,19 @@
 //
 
 #pragma once
-#include "PamMapValue.hh"
+#include "CtxMapValue.hh"
 #include <memory>
 #include <string>
 
 namespace ctx {
 
-/** Accessor to a PamMap object. Can be used to retrieve the key or the value
+/** Accessor to a CtxMap object. Can be used to retrieve the key or the value
  *  or the typename of the value */
 template <bool Const>
-class PamMapAccessor {};
+class CtxMapAccessor {};
 
 template <>
-class PamMapAccessor<true> {
+class CtxMapAccessor<true> {
  public:
   /** Return the key of the key/value pair the accessor holds */
   const std::string& key() const { return m_key; }
@@ -65,21 +65,21 @@ class PamMapAccessor<true> {
    *
    * \note This is an advanced method. Use only if you know what you are doing.
    **/
-  const PamMapValue& value_raw() const { return m_value; }
+  const CtxMapValue& value_raw() const { return m_value; }
 
   /** Construct an accessor */
-  PamMapAccessor(const std::string key, const PamMapValue& value)
+  CtxMapAccessor(const std::string key, const CtxMapValue& value)
         : m_key(key), m_value(value) {}
 
  private:
   const std::string m_key;
-  const PamMapValue& m_value;
+  const CtxMapValue& m_value;
 };
 
 template <>
-class PamMapAccessor<false> : public PamMapAccessor<true> {
+class CtxMapAccessor<false> : public CtxMapAccessor<true> {
   // Use the const version as the base type:
-  typedef PamMapAccessor<true> base_type;
+  typedef CtxMapAccessor<true> base_type;
 
  public:
   /** Return the value of the key/value pair the accessor holds.
@@ -128,20 +128,20 @@ class PamMapAccessor<false> : public PamMapAccessor<true> {
    *
    * \note This is an advanced method. Use only if you know what you are doing.
    **/
-  const PamMapValue& value_raw() const { return m_value; }
+  const CtxMapValue& value_raw() const { return m_value; }
 
   /** Return a reference to the raw value object the accessor holds.
    *
    * \note This is an advanced method. Use only if you know what you are doing.
    **/
-  PamMapValue& value_raw() { return m_value; }
+  CtxMapValue& value_raw() { return m_value; }
 
   /** Construct an accessor */
-  PamMapAccessor(const std::string key, PamMapValue& value)
+  CtxMapAccessor(const std::string key, CtxMapValue& value)
         : base_type(key, value), m_value(value) {}
 
  private:
-  PamMapValue& m_value;
+  CtxMapValue& m_value;
 };
 
 }  // namespace ctx

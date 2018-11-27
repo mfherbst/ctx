@@ -17,7 +17,7 @@
 // along with ctx. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include "PamMapValue.hh"
+#include "CtxMapValue.hh"
 #include <iomanip>
 
 namespace ctx {
@@ -28,9 +28,9 @@ namespace ctx {
     o << std::setw(10) << std::left << value.get<const TYPE>();          \
   }
 
-/** Try to provide a string representation of the PamMapValue. If this fails, just print
+/** Try to provide a string representation of the CtxMapValue. If this fails, just print
  * the type */
-std::ostream& operator<<(std::ostream& o, const PamMapValue& value) {
+std::ostream& operator<<(std::ostream& o, const CtxMapValue& value) {
 
   /* clang-format off */
        IF_TYPE_PRINT(bool)

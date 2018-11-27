@@ -18,12 +18,12 @@
 //
 
 #pragma once
-#include "PamMapIterator.hh"
+#include "CtxMapIterator.hh"
 #include "exceptions.hh"
 
 namespace ctx {
 
-/** PamMap implements a map from a std::string to objects of arbitrary
+/** CtxMap implements a map from a std::string to objects of arbitrary
  *  type.
  *
  *  This way an arbitrary amount of arbitrary objects can be passed
@@ -33,30 +33,30 @@ namespace ctx {
  *  The functionality in this class deliberately resembles Python
  *  dictionaries to a large extent.
  *
- *  In the implementation of the PamMap, the character '/' has
+ *  In the implementation of the CtxMap, the character '/' has
  *  a special meaning as it allows to access a submap, so "a/b/c",
  *  fills an object into the entry c in submap b of the submap a.
  *  See the submap function for some more details.
  */
-class PamMap {
+class CtxMap {
  public:
-  typedef PamMapValue entry_value_type;
+  typedef CtxMapValue entry_value_type;
   typedef std::map<std::string, entry_value_type> map_type;
   typedef std::pair<const std::string, entry_value_type> entry_type;
-  typedef PamMapIterator<true> const_iterator;
-  typedef PamMapIterator<false> iterator;
+  typedef CtxMapIterator<true> const_iterator;
+  typedef CtxMapIterator<false> iterator;
 
   /** \name Constructors, destructors and assignment */
   ///@{
   /** \brief default constructor
    * Constructs empty map */
-  PamMap() : m_container_ptr{std::make_shared<map_type>()}, m_location{""} {}
+  CtxMap() : m_container_ptr{std::make_shared<map_type>()}, m_location{""} {}
 
   /** \brief Construct parameter map from initialiser list of entry_types */
-  PamMap(std::initializer_list<entry_type> il) : PamMap{} { update(il); };
+  CtxMap(std::initializer_list<entry_type> il) : CtxMap{} { update(il); };
 
-  ~PamMap()        = default;
-  PamMap(PamMap&&) = default;
+  ~CtxMap()        = default;
+  CtxMap(CtxMap&&) = default;
 
   /** \brief Copy constructor
    *
@@ -69,8 +69,8 @@ class PamMap {
    *
    * Consider as an example:
    * ```
-   * PamMap map{"a", 1};
-   * PamMap copy(map);
+   * CtxMap map{"a", 1};
+   * CtxMap copy(map);
    * copy.update("a", 42);
    *
    * std::cout << map.at<int>("a");
@@ -78,8 +78,8 @@ class PamMap {
    * ```
    * This will print 1 and then 42, but
    * ```
-   * PamMap map{"a", 1};
-   * PamMap copy(map);
+   * CtxMap map{"a", 1};
+   * CtxMap copy(map);
    * copy.at<int>("a") = 42;
    *
    * std::cout << map.at<int>("a");
@@ -87,10 +87,10 @@ class PamMap {
    * ```
    * will print 42 twice.
    * */
-  PamMap(const PamMap& other);
+  CtxMap(const CtxMap& other);
 
   /** \brief Assignment operator */
-  PamMap& operator=(PamMap other);
+  CtxMap& operator=(CtxMap other);
   ///@}
 
   /** \name Modifiers */
@@ -114,7 +114,7 @@ class PamMap {
    * */
   void update(std::initializer_list<entry_type> il);
 
-  /** \brief Update many entries using another PamMap
+  /** \brief Update many entries using another CtxMap
    *
    * The entries are updated relative to the given key paths.
    * I.e. if key == "blubber" and the map \t map contairs "foo" and
@@ -127,29 +127,29 @@ class PamMap {
    *
    * Roughly speaking modification of entries via ``at`` affects both
    * ``this`` and ``map``, wherease modification of entries via ``update``
-   * only effects the PamMap object on which the method is called.
+   * only effects the CtxMap object on which the method is called.
    * */
-  void update(const std::string& key, const PamMap& other);
+  void update(const std::string& key, const CtxMap& other);
 
-  /** \brief Update many entries using another PamMap
+  /** \brief Update many entries using another CtxMap
    *
    * The entries are updated relative to the given key paths.
    * I.e. if key == "blubber" and the map \t map contairs "foo" and
    * "bar", then "blubber/foo" and "blubber/bar" will be updated.
    * */
-  void update(const std::string& key, PamMap&& other);
+  void update(const std::string& key, CtxMap&& other);
 
-  /** \brief Update many entries using another PamMap
+  /** \brief Update many entries using another CtxMap
    *
    * The entries are updated in paths relative to /
    * */
-  void update(const PamMap& other) { update("/", other); }
+  void update(const CtxMap& other) { update("/", other); }
 
-  /** \brief Update many entries using another PamMap
+  /** \brief Update many entries using another CtxMap
    *
    * The entries are updated in paths relative to /
    */
-  void update(PamMap&& other) { update("/", std::move(other)); }
+  void update(CtxMap&& other) { update("/", std::move(other)); }
 
   /** Insert or update a key with a copy of an element */
   template <typename T>
@@ -241,10 +241,10 @@ class PamMap {
    * If the type requested is wrong the program is aborted.
    *
    * \note This directly modifies the data in memory, so all
-   * PamMap objects which internally refer to this data
+   * CtxMap objects which internally refer to this data
    * will be changed by modifying this value as well. This not
    * only includes submaps, but also deep copies of this
-   * PamMap either done by ``update(std::string, PamMap)``
+   * CtxMap either done by ``update(std::string, CtxMap)``
    * or by the copy constructor. See the documentation of the
    * copy constructor for details.
    */
@@ -323,11 +323,11 @@ class PamMap {
 
   //@}
 
-  /** Return an PamMapValue object representing the data behind the specified key
+  /** Return an CtxMapValue object representing the data behind the specified key
    *
    * \note This is an advanced method. Use only if you know what you are doing.
    * */
-  PamMapValue& at_raw_value(const std::string& key) {
+  CtxMapValue& at_raw_value(const std::string& key) {
     auto itkey = m_container_ptr->find(make_full_key(key));
     if (itkey == std::end(*m_container_ptr)) {
       throw out_of_range("Key '" + key + "' is not known.");
@@ -335,12 +335,12 @@ class PamMap {
     return itkey->second;
   }
 
-  /** Return an PamMapValue object representing the data behind the specified key
+  /** Return an CtxMapValue object representing the data behind the specified key
    * (const version)
    *
    * \note This is an advanced method. Use only if you know what you are doing.
    * */
-  const PamMapValue& at_raw_value(const std::string& key) const {
+  const CtxMapValue& at_raw_value(const std::string& key) const {
     auto itkey = m_container_ptr->find(make_full_key(key));
     if (itkey == std::end(*m_container_ptr)) {
       throw out_of_range("Key '" + key + "' is not known.");
@@ -365,7 +365,7 @@ class PamMap {
   ///@{
   /** \brief Get a submap starting pointing at a different location.
    *
-   * The PamMap allows the hierarchical organisation of data
+   * The CtxMap allows the hierarchical organisation of data
    * in the form of UNIX paths. So the key "bla/blubber/foo" actually
    * emplaces a value in the path "/bla/blubber/foo". If one obtains
    * a submap at location "/bla", the same key is now available under
@@ -380,15 +380,15 @@ class PamMap {
    * Escaping a submap via ".." is not possible. This means that the submap
    * at location "bla" does still not contain a key "../bla/blubber/foo",
    * but it does contain a key "../blubber/foo", since the leading ".."
-   * has no effect (we are at the root of the PamMap)
+   * has no effect (we are at the root of the CtxMap)
    *
    * The submap is a shallow copy of a subpath of *this. This means that
    * both the pointer and the referred values are identical. So unlike the
    * copy constructor both ``update`` and ``at`` of both maps
    * work on the same state. I.e.
    * ```
-   * PamMap map{"/tree/a", 1};
-   * PamMap sub = map.submap("tree");
+   * CtxMap map{"/tree/a", 1};
+   * CtxMap sub = map.submap("tree");
    * sub.update("a", 42);
    *
    * std::cout << map.at<int>("/tree/a");
@@ -396,8 +396,8 @@ class PamMap {
    * ```
    * will print 42 twice and
    * ```
-   * PamMap map{"/tree/a", 1};
-   * PamMap sub = map.submap("tree");
+   * CtxMap map{"/tree/a", 1};
+   * CtxMap sub = map.submap("tree");
    * sub.at<int>("a") =  42;
    *
    * std::cout << map.at<int>("a");
@@ -405,15 +405,15 @@ class PamMap {
    * ```
    * will print 42 twice as well.
    * */
-  PamMap submap(const std::string& location) {
+  CtxMap submap(const std::string& location) {
     // Construct new map, but starting at a different location
-    return PamMap{*this, location};
+    return CtxMap{*this, location};
   }
 
   /** Get a const submap */
-  const PamMap submap(const std::string& location) const {
+  const CtxMap submap(const std::string& location) const {
     // Construct new map, but starting at a different location
-    return PamMap{*this, location};
+    return CtxMap{*this, location};
   }
   ///@}
 
@@ -454,15 +454,15 @@ class PamMap {
   //        - erase using iterators ?
 
  protected:
-  /** \brief Construct parameter map from a reference to another PamMap
+  /** \brief Construct parameter map from a reference to another CtxMap
    *  and a new location.
    *
-   * The newlocation is relative to the original PamMap ``orig``, since
+   * The newlocation is relative to the original CtxMap ``orig``, since
    * it is processed through ``other.make_full_key()``. In other words this
    * constructor is only suitable to move downwards in the tree and never upwards.
    * Note that this is due to the fact, that make_full_key ignores leading "../".
    *
-   * The returned PamMap is essentially a shallow copy to a subtree
+   * The returned CtxMap is essentially a shallow copy to a subtree
    * of the input map (i.e. a view into a subtree). Since they operate
    * on the same inner data, all changes will be visible to both objects.
    *
@@ -472,7 +472,7 @@ class PamMap {
    * \note This is an advanced constructor. Use only if you know what you are
    * doing.
    **/
-  PamMap(const PamMap& other, std::string newlocation)
+  CtxMap(const CtxMap& other, std::string newlocation)
         : m_container_ptr{other.m_container_ptr},
           m_location{other.make_full_key(newlocation)} {}
 
@@ -512,14 +512,14 @@ class PamMap {
   std::string m_location;
 };
 
-std::ostream& operator<<(std::ostream& o, const PamMap& map);
+std::ostream& operator<<(std::ostream& o, const CtxMap& map);
 
 //
 // -----------------------------------------------------------------
 //
 
 template <typename T>
-T& PamMap::at(const std::string& key, T& default_value) {
+T& CtxMap::at(const std::string& key, T& default_value) {
   auto itkey = m_container_ptr->find(make_full_key(key));
   if (itkey == std::end(*m_container_ptr)) {
     return default_value;  // Key not found
@@ -529,7 +529,7 @@ T& PamMap::at(const std::string& key, T& default_value) {
 }
 
 template <typename T>
-const T& PamMap::at(const std::string& key, const T& default_value) const {
+const T& CtxMap::at(const std::string& key, const T& default_value) const {
   auto itkey = m_container_ptr->find(make_full_key(key));
   if (itkey == std::end(*m_container_ptr)) {
     return default_value;  // Key not found
@@ -539,7 +539,7 @@ const T& PamMap::at(const std::string& key, const T& default_value) const {
 }
 
 template <typename T>
-std::shared_ptr<T> PamMap::at_ptr(const std::string& key,
+std::shared_ptr<T> CtxMap::at_ptr(const std::string& key,
                                   std::shared_ptr<T> default_ptr) {
   auto itkey = m_container_ptr->find(make_full_key(key));
   if (itkey == std::end(*m_container_ptr)) {
@@ -550,7 +550,7 @@ std::shared_ptr<T> PamMap::at_ptr(const std::string& key,
 }
 
 template <typename T>
-std::shared_ptr<const T> PamMap::at_ptr(const std::string& key,
+std::shared_ptr<const T> CtxMap::at_ptr(const std::string& key,
                                         std::shared_ptr<const T> default_ptr) const {
   auto itkey = m_container_ptr->find(make_full_key(key));
   if (itkey == std::end(*m_container_ptr)) {
@@ -561,7 +561,7 @@ std::shared_ptr<const T> PamMap::at_ptr(const std::string& key,
 }
 
 template <typename Map>
-auto PamMap::starting_keys_end(Map& map, const std::string& start)
+auto CtxMap::starting_keys_end(Map& map, const std::string& start)
       -> decltype(std::end(map)) {
   // If start is empty, then we iterate over the full map:
   if (start.length() == 0) return std::end(map);

@@ -21,8 +21,8 @@
 
 set(CTX_SOURCES
   ctx/demangle.cc
-  ctx/PamMapValue.cc
-  ctx/PamMap.cc
+  ctx/CtxMapValue.cc
+  ctx/CtxMap.cc
   libctx/params.C
   libctx/context.C
 )

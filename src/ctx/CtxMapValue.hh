@@ -26,10 +26,10 @@
 
 namespace ctx {
 
-// Forward-declare. Proper declaration in PamMap.hh
-class PamMap;
+// Forward-declare. Proper declaration in CtxMap.hh
+class CtxMap;
 
-/** \brief Class to contain an entry value in a PamMap, i.e. the thing the
+/** \brief Class to contain an entry value in a CtxMap, i.e. the thing the
  *  key string actually points to.
  *
  * Can be constructed from elementary types by copying their value or from
@@ -37,12 +37,12 @@ class PamMap;
  * map or from an object which is subscribable (which will automatically be
  * subscribed to.
  */
-class PamMapValue {
+class CtxMapValue {
  public:
   /** \brief Default constructor: Constructs empty object */
-  PamMapValue() : m_object_ptr{nullptr} {}
+  CtxMapValue() : m_object_ptr{nullptr} {}
 
-  /** \brief Make a PamMapValue out of a type which is cheap to copy.
+  /** \brief Make a CtxMapValue out of a type which is cheap to copy.
    *
    * This includes std::string and all relevant numeric types (integers,
    * floating point numbers, complex numbers)
@@ -50,41 +50,41 @@ class PamMapValue {
   template <typename T, typename std::enable_if<!std::is_reference<T>::value &&
                                                       IsCheaplyCopyable<T>::value,
                                                 int>::type = 0>
-  PamMapValue(T t) : PamMapValue{std::make_shared<T>(std::move(t))} {}
+  CtxMapValue(T t) : CtxMapValue{std::make_shared<T>(std::move(t))} {}
   // Note about the enable_if:
   //   - We need to make sure that T is the actual type (and not a
   //     reference)
   //   - T should be cheap to copy
 
-  /** \brief Make an PamMapValue out of a const char*.
+  /** \brief Make an CtxMapValue out of a const char*.
    *
-   * This behaves like the equivalent PamMapValue of a  std::string */
-  PamMapValue(const char* s) : PamMapValue(std::string(s)) {}
+   * This behaves like the equivalent CtxMapValue of a  std::string */
+  CtxMapValue(const char* s) : CtxMapValue(std::string(s)) {}
 
-  /** \brief Make a PamMapValue from a shared pointer */
+  /** \brief Make a CtxMapValue from a shared pointer */
   template <typename T, typename = typename std::enable_if<!std::is_same<
-                              PamMap, typename std::decay<T>::type>::value>::type>
-  PamMapValue(std::shared_ptr<T> t_ptr)
+                              CtxMap, typename std::decay<T>::type>::value>::type>
+  CtxMapValue(std::shared_ptr<T> t_ptr)
         : m_object_ptr(t_ptr), m_type_name(typeid(T).name()) {}
 
-  /** \brief Make a PamMapValue from a shared pointer */
+  /** \brief Make a CtxMapValue from a shared pointer */
   template <typename T, typename = typename std::enable_if<!std::is_same<
-                              PamMap, typename std::decay<T>::type>::value>::type>
-  PamMapValue(std::shared_ptr<const T> t_ptr)
+                              CtxMap, typename std::decay<T>::type>::value>::type>
+  CtxMapValue(std::shared_ptr<const T> t_ptr)
         : m_object_ptr{std::const_pointer_cast<T>(t_ptr)},
           m_type_name(typeid(const T).name()) {}
 
-  /** Make an PamMapValue from an rvalue reference */
+  /** Make an CtxMapValue from an rvalue reference */
   template <typename T,
             typename = typename std::enable_if<
                   !std::is_reference<T>::value && !IsCheaplyCopyable<T>::value &&
-                  !std::is_same<PamMap, typename std::decay<T>::type>::value>::type>
-  PamMapValue(T&& t) : PamMapValue{std::make_shared<T>(std::move(t))} {}
+                  !std::is_same<CtxMap, typename std::decay<T>::type>::value>::type>
+  CtxMapValue(T&& t) : CtxMapValue{std::make_shared<T>(std::move(t))} {}
   // Note about the enable_if:
   //   - We need to make sure that T is the actual type (and not a
   //     reference)
   //   - T should not be cheap to copy (else first constructor applies)
-  //   - T should not be a PamMap (we do not want maps in maps)
+  //   - T should not be a CtxMap (we do not want maps in maps)
 
   /** Obtain a non-const pointer to the internal object */
   template <typename T>
@@ -135,34 +135,34 @@ class PamMapValue {
   std::string m_type_name;
 };
 
-/** Try to provide a string representation of the PamMapValue. If this fails, just print
+/** Try to provide a string representation of the CtxMapValue. If this fails, just print
  * the demangled type */
-std::ostream& operator<<(std::ostream& o, const PamMapValue& value);
+std::ostream& operator<<(std::ostream& o, const CtxMapValue& value);
 
 //
 // ----------------------------------------------------------------
 //
 
 template <typename T>
-std::shared_ptr<T> PamMapValue::get_ptr() {
+std::shared_ptr<T> CtxMapValue::get_ptr() {
   if (m_object_ptr == nullptr) {
-    throw runtime_error("PamMapValue is empty.");
+    throw runtime_error("CtxMapValue is empty.");
   }
   if (!can_get_value_as<T>()) {
     throw type_mismatch("Requested invalid type '" + demangle(typeid(T)) +
-                        "' from PamMap. The value has type '" + type_name() + "'.");
+                        "' from CtxMap. The value has type '" + type_name() + "'.");
   }
   return std::static_pointer_cast<T>(m_object_ptr);
 }
 
 template <typename T>
-std::shared_ptr<const T> PamMapValue::get_ptr() const {
+std::shared_ptr<const T> CtxMapValue::get_ptr() const {
   if (m_object_ptr == nullptr) {
-    throw runtime_error("PamMapValue is empty.");
+    throw runtime_error("CtxMapValue is empty.");
   }
   if (!can_get_value_as<T>()) {
     throw type_mismatch("Requested invalid type '" + demangle(typeid(T)) +
-                        "' from PamMap. The value has type '" + type_name() + "'.");
+                        "' from CtxMap. The value has type '" + type_name() + "'.");
   }
   return std::static_pointer_cast<const T>(m_object_ptr);
 }

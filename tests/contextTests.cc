@@ -85,7 +85,7 @@ TEST_CASE("Test context", "[context]") {
     stor.insert("/data", make_rcptr<int>(4));
     stor.insert("/other/data", make_rcptr<int>(99));
 #else
-    PamMap stor{
+    CtxMap stor{
           {"tree/data", 1}, {"tree/string", "string"}, {"data", 4}, {"other/data", 99}};
 #endif
     context ctx(stor);
@@ -166,7 +166,7 @@ TEST_CASE("Test context", "[context]") {
     stor.insert("/tree/data", make_rcptr<int>(39));
     stor.insert("/tree/string", make_rcptr<std::string>("string"));
 #else
-    PamMap stor{{"tree/data", 39}, {"tree/string", "string"}};
+    CtxMap stor{{"tree/data", 39}, {"tree/string", "string"}};
 #endif  // TEST_QCHEM_LIBCTX
     context ctx(stor);
     context tree(ctx, "tree");

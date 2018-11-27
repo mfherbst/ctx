@@ -30,7 +30,7 @@ namespace libctx {
  *  object by Epifanovsky et. al.
  *
  *  The purpose is to provide a libctx-like interface to our
- *  PamMap, which is in fact typedefed to ``root_storage``.
+ *  CtxMap, which is in fact typedefed to ``root_storage``.
  *
  *  We also use C++ 11 smart pointers instead of their rc_ptr objects.
  */
@@ -38,7 +38,7 @@ class context {
  public:
   /** \name Constructors */
   ///@{
-  /** Create from root_storage, i.e. PamMap */
+  /** Create from root_storage, i.e. CtxMap */
   context(root_storage& stor)
         : m_map_ptr{std::make_shared<root_storage>(stor.submap(""))}, m_location{""} {}
 
@@ -126,11 +126,11 @@ class context {
   /** Print the contents of the context to the output stream */
   void print(std::ostream& os = std::cout) const;
 
-  /** Return a reference to the PamMap used to store the values */
-  PamMap& map() { return *m_map_ptr; }
+  /** Return a reference to the CtxMap used to store the values */
+  CtxMap& map() { return *m_map_ptr; }
 
-  /** Return a const reference to the PamMap used to store the values */
-  const PamMap& map() const { return *m_map_ptr; }
+  /** Return a const reference to the CtxMap used to store the values */
+  const CtxMap& map() const { return *m_map_ptr; }
 
  private:
   std::shared_ptr<root_storage> m_map_ptr;

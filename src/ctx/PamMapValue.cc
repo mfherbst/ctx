@@ -18,13 +18,14 @@
 //
 
 #include "PamMapValue.hh"
+#include <iomanip>
 
 namespace ctx {
 
 #define IF_TYPE_PRINT(TYPE)                                              \
   if (value.type_name_raw() == std::string(typeid(TYPE).name()) ||       \
       value.type_name_raw() == std::string(typeid(const TYPE).name())) { \
-    o << value.get<TYPE>();                                              \
+    o << std::setw(10) << std::left << value.get<const TYPE>();          \
   }
 
 /** Try to provide a string representation of the PamMapValue. If this fails, just print
@@ -46,7 +47,7 @@ std::ostream& operator<<(std::ostream& o, const PamMapValue& value) {
   else IF_TYPE_PRINT(long double)
   else IF_TYPE_PRINT(std::string)
   else {
-    o << "<cannot represent>";
+    o << std::setw(10) << std::left << "???";
   }
   /* clang-format on */
 

@@ -121,7 +121,7 @@ TEST_CASE("Test context", "[context]") {
     // Insert from the root_storage object
     stor.insert("/tree/outside", make_rcptr<int>(-12));
 #else
-    // Insert from a GenMap submap.
+    // Insert from a CtxMap submap.
     stor.submap("tree").update("outside", -12);
 #endif
     REQUIRE(*ctx.get<int>("tree/outside") == -12);

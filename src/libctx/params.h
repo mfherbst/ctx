@@ -45,11 +45,11 @@ class params {
 
   /** Create a deep copy of a CtxMap.
    *
-   * We copy all values, so the input GenMap and
+   * We copy all values, so the input CtxMap and
    * the constructed object have no internal relationship
    * and operate on different memory.
    *
-   * \note The GenMap may only contain string values,
+   * \note The CtxMap may only contain string values,
    *       i.e. all keys should map to a value type of
    *       std::string
    */
@@ -185,7 +185,7 @@ class params {
 
  private:
   /** Internal constructor to make a params object from an already existent
-   *  pointer to a  GenMap */
+   *  pointer to a  CtxMap */
   params(std::unique_ptr<CtxMap> map_ptr)
         : m_map_ptr(std::move(map_ptr)), m_subtree_cache() {}
 
@@ -193,7 +193,7 @@ class params {
     return raw_key[0] == '/' ? raw_key : "/" + raw_key;
   }
 
-  //! The GenMap representing this tree. Contains only strings.
+  //! The CtxMap representing this tree. Contains only strings.
   std::unique_ptr<CtxMap> m_map_ptr;
 
   //! Cache for subtree objects.

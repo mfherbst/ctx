@@ -88,7 +88,7 @@ std::ostream& operator<<(std::ostream& os, const params& p) {
   const char delimiter = '.';
 
   for (auto& kv : *p.m_map_ptr) {
-    // Since the GenMap uses '/' as the delimiter,
+    // Since the CtxMap uses '/' as the delimiter,
     // we need to replace those characters here.
     // We skip the leading /
 

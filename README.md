@@ -3,7 +3,7 @@
 ``ctx`` is a drop-in replacement for the default context library ``libctx``
 of the Q-Chem quantum chemistry software. It provides (almost) the same
 interface as ``libctx``, but uses a different back-end, namely
-the ``PamMap`` class based on `shared_ptr` objects.
+the ``CtxMap`` class based on `shared_ptr` objects.
 
 ## Obtaining and building ``ctx``
 Check out the ``ctx`` git repository.
@@ -24,9 +24,9 @@ My reasons were:
 - ``libctx`` has a very verbose and clunky interface.
 - The ``rc_ptr`` implementation of a reference-counted pointer is
   not thread-safe.
-- The ``PamMap`` is a slightly specialised variant of the ``GenMap``
+- The ``CtxMap`` is a slightly specialised variant of the ``GenMap``
   I implemented a while back into [``krims``](https::/lazyten.org/krims).
-  Both the ``PamMap`` as well as the ``GenMap`` have a more intuitive
+  Both the ``CtxMap`` as well as the ``GenMap`` have a more intuitive
   interface when it comes to updating  or storing data. It also provides
   more features for accessing stored values.
 - ``context`` objects in ``libctx`` do not allow to
@@ -53,7 +53,7 @@ quite some time now.
 Other points to mention:
 - ``ctx`` and ``libctx`` largely have the same interface,
   but in order to simplify the implementation with the
-  ``PamMap`` I decided to drop support for some stuff.
+  ``CtxMap`` I decided to drop support for some stuff.
   To the best of my knowledge these features are not used anywhere.
   If this leads to problems when compiling Q-Chem code,
   please let [me](AUTHORS.md) know. I consider this a bug.
@@ -63,16 +63,16 @@ Other points to mention:
 	  contain the character "/".
 
 ### Improvements over ``libctx``
-- This library has extra functionality via the interface to the internal ``PamMap``
-  objects.
-- The ``root_storage`` of ``ctx::context`` objects is exactly the ``PamMap``.
-  In other words, ``ctx::context`` is really only a wrapper around ``PamMap``.
+- This library has extra functionality via the ``map()`` function, which
+  offers access to the internal ``CtxMap`` object.
+- The ``root_storage`` of ``ctx::context`` objects is exactly the ``CtxMap``.
+  In other words, ``ctx::context`` is really only a wrapper around ``CtxMap``.
   Since all changes done by either acting on the ``root_storage`` as well
   as the ``ctx::context`` effect the other object, both interfaces
   can be used simultaneously, e.g.
   
   ```cpp
-  ctx::PamMap stor{{"bla", 5}};
+  ctx::CtxMap stor{{"bla", 5}};
   ctx::context ctx(stor);
 
   ctx.update("bla", rc_ptr<int>(new int(6)));
@@ -82,10 +82,10 @@ Other points to mention:
   ```
   
   will print the value ``7`` which has been set via the ``stor`` object,
-  i.e. the ``PamMap`` interface.
-- ``ctx::params`` objects contain a ``PamMap`` to store their data.
+  i.e. the ``CtxMap`` interface.
+- ``ctx::params`` objects contain a ``CtxMap`` to store their data.
   It can be referenced (and altered) using the ``map()`` function.
-- Thanks to the ``PamMap``, ``ctx::context`` objects can now be printed,
+- Thanks to the ``CtxMap``, ``ctx::context`` objects can now be printed,
   including the data types of the stored data and (for some data types)
   even the values. This is implemented via the usual ``operator<<``
   functionality.

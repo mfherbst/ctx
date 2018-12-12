@@ -52,6 +52,11 @@ endif()
 
 add_subdirectory(src)
 
+option(CTX_ENABLE_EXAMPLES "Build ctx examples" ON)
+if (CTX_ENABLE_EXAMPLES)
+	add_subdirectory(examples)
+endif()
+
 option(CTX_ENABLE_TESTS "Build ctx tests" ON)
 if(CTX_ENABLE_TESTS)
 	enable_testing()

@@ -27,11 +27,11 @@ set(CTX_TESTS_SOURCES
 )
 
 # Module to setup catch test targets
-include(${CATCH_DIR}/ParseAndAddCatchTests.cmake)
+include(${CTX_CATCH_DIR}/ParseAndAddCatchTests.cmake)
 
 include_directories("${ctx_SOURCE_DIR}/src")
 add_executable(ctx_tests ${CTX_TESTS_SOURCES})
-target_link_libraries(ctx_tests ctx Catch)
+target_link_libraries(ctx_tests ctx CtxCatch)
 ParseAndAddCatchTests(ctx_tests)
 
 # Check wether we are supposed to check Q-Chem's libctx library

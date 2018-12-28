@@ -17,7 +17,7 @@
 ## ---------------------------------------------------------------------
 
 # Setup catch as target
-set(CATCH_DIR "${CMAKE_CURRENT_LIST_DIR}" CACHE INTERNAL "")
+set(CTX_CATCH_DIR "${CMAKE_CURRENT_LIST_DIR}" CACHE INTERNAL "")
 
-add_library(Catch INTERFACE)
-target_include_directories(Catch INTERFACE "${CATCH_DIR}/..")
+add_library(CtxCatch INTERFACE)
+target_include_directories(CtxCatch INTERFACE "${CTX_CATCH_DIR}/..")

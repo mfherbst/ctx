@@ -20,7 +20,7 @@ include(CheckCXXSourceCompiles)
 CHECK_CXX_SOURCE_COMPILES(
 	"#include <cxxabi.h>
 	#include <string>
-	#include <cstddev>
+	#include <cstddef>
 	int main() {
 		const char* mangled = typeid(bool).name();
 		int status;

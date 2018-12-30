@@ -1,15 +1,13 @@
-ctx authors
-===========
+# `ctx` authors
 
-``ctx`` was written by Michael F. Herbst (``info@michael-herbst.com``).
+``ctx`` is written and maintained by Michael F. Herbst (``info@michael-herbst.com``).
 Please report any bugs or provide suggestions
 on [github](https://github.com/mfherbst/ctx.git) or send them directly
 to the author.
 
-Authors of the original ``libctx``
-==================================
-``ctx`` is intended to be a drop-in replacement for the corresponding
-``libctx`` library inside the [Q-Chem](http://www.q-chem.com/) quantum
-chemistry package. Some of the interfaces of this very library (but not the
-actual implementation) is therefore based upon the equivalent interfaces
-of Q-Chem's ``libctx`` by Epifanovsky *et. al.*.
+The initial design of `ctx` was adapted from the `libctx` library
+of E. Epifanovsky *et. al.*, distributed as part of the
+[Q-Chem](http://www.q-chem.com/) quantum chemistry package.
+The `src/libctx` compatibility interface still resembles the
+original interface of `libctx`, but provides a different implementation
+under the hood.

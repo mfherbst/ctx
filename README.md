@@ -1,14 +1,39 @@
-# ``ctx``: A drop-in replacement for Q-Chem's ``libctx``
+# ``ctx``: Key-value datastructure for organised hierarchical storage
 
-``ctx`` is a drop-in replacement for the default context library ``libctx``
-of the Q-Chem quantum chemistry software. It provides (almost) the same
-interface as ``libctx``, but uses a different back-end, namely
-the ``CtxMap`` class based on `shared_ptr` objects.
+A common pattern in numerical computation is that input parameters or
+computed simulation data occurs in a tree-like, hierarchical fashion.
+That is to say, that different steps of a simulation algorithm
+often deal with larger numbers of parameters or data,
+which is not necessarily of concern for any other part of the full simulation.
+As a result, such objects are best grouped together
+in one part of a larger tree, separate from
+another subtree with the context of data and parameters
+for yet another step of the full procedure.
+
+This library allows to achieve exactly that
+by providing a tree-like string-to-value mapping, the `CtxMap`.
+While the key in such a mapping is forced to be a path-like
+string such as `/this/is/a/path/to/a/value`,
+the value can be of arbitrary type.
+My means of rich functionality, such as views into subtrees
+or iterators over ranges of keys,
+navigating and accessing such a hierarchical data storage
+is greatly facilitated.
+
+Other key features include:
+  - **Based on `shared_ptr`**: All data is stored as `std::shared_ptr`
+    integrating well into the `C++` standard library and modern
+    `C++` codes.
+  - **Type safety**: Even though arbitrary types may be stored
+    inside a `CtxMap`, an explicit checking mechanism makes sure
+    that the type is kept consistent.
+  - **Thread-safety**: Access to the `CtxMap` *should* be thread-safe,
+    even though this has not been properly tested.
 
 ## Obtaining and building ``ctx``
 Check out the ``ctx`` git repository.
-All compilers starting from ``clang-3.5`` and ``gcc-4.8`` should be able to build the code.
-``C++11`` support is absolutely required.
+All compilers starting from ``clang-3.5`` and ``gcc-4.8`` should
+be able to build the code. ``C++11`` support is required.
 
 To build and test:
 ```
@@ -18,24 +43,24 @@ cmake --build .
 ctest
 ```
 
-## Motivation for re-inventing the wheel
-One might wonder why I decided to re-write ``libctx`` from scratch.
-My reasons were:
-- ``libctx`` has a very verbose and clunky interface.
-- The ``rc_ptr`` implementation of a reference-counted pointer is
-  not thread-safe.
-- The ``CtxMap`` is a slightly specialised variant of the ``GenMap``
-  I implemented a while back into [``krims``](https::/lazyten.org/krims).
-  Both the ``CtxMap`` as well as the ``GenMap`` have a more intuitive
-  interface when it comes to updating  or storing data. It also provides
-  more features for accessing stored values.
-- ``context`` objects in ``libctx`` do not allow to
-  iterate over the keys or the value they contain.
-  One always has to *know* what keys are sensible. Printing the values
-  and types of all keys in the context is not possible as far as I know.
+## Motivation
+The driving force behind `ctx` was to provide a more modern approach
+to the concept of a `context` storage as implemented in the
+`libctx` library
+within the quantum-chemistry package [Q-Chem](https://q-chem.com)
+For this the design of data structures such as the
+[PamMap](https://github.com/mfherbst/pammap),
+and the
+[GenMap](https://github.com/lazyten/krims#genmap-a-hierachical-dictionary-for-managing-data-of-arbitrary-type)
+was expanded to support all functionality of `libctx`,
+leading to the `CtxMap`.
+Based on the `CtxMap` back-end, `ctx` provides
+a compatibility layer,
+which offers (almost) the same interface as the original `libctx`
+by E. Epifanovsky *et. al.*.
 
 ## Replacing Q-Chem's ``libctx`` by ``ctx``
-It should be as simple as replacing the ``libctx``
+In theory it should be as simple as replacing the ``libctx``
 directory by the files of this repository.
 If there are problems compiling Q-Chem this way,
 please let [me](AUTHORS.md) know.
@@ -47,8 +72,8 @@ sure that both libraries show the identical behaviour.
 Of cause there could be things I have missed, so
 please beware that ``ctx`` is *not exactly* ``libctx``.
 It should be noted, however, that *adcman* work with ``ctx``
-perfectly and has been used by myself in this way for
-quite some time now.  
+perfectly and has been used in this way for over two years
+in production.  
 
 Other points to mention:
 - ``ctx`` and ``libctx`` largely have the same interface,
@@ -56,11 +81,11 @@ Other points to mention:
   ``CtxMap`` I decided to drop support for some stuff.
   To the best of my knowledge these features are not used anywhere.
   If this leads to problems when compiling Q-Chem code,
-  please let [me](AUTHORS.md) know. I consider this a bug.
+  please let [me](AUTHORS.md) know. This is considered a bug.
 - Most notable deviations from ``libctx``:
 	- [``params``](src/ctx/params.h) has no support for iterators
 	- Keys inside [``params``](src/ctx/params.h) objects may not
-	  contain the character "/".
+	  contain the character `"/"`.
 
 ### Improvements over ``libctx``
 - This library has extra functionality via the ``map()`` function, which
@@ -76,7 +101,7 @@ Other points to mention:
   ctx::context ctx(stor);
 
   ctx.update("bla", rc_ptr<int>(new int(6)));
-  stor.update("bla",7);
+  stor.update("bla", 7);
 
   std::cout << *ctx.get<int>("bla");
   ```
@@ -107,8 +132,8 @@ cd build
 cmake ..
 make -j 4
 ```
-Now you can configure the built of this project.
-In order to also make the test which employs the ``libctx``
-in ``external/libctx`` set the cmake property
+Now you may configure and build this project.
+In order to have the tests use the ``libctx`` of
+``external/libctx``, set the cmake property
 ``TEST_QCHEM_LIBCTX`` via the commandline flag ``-DTEST_QCHEM_LIBCTX=ON``
 when you run cmake.

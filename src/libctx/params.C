@@ -15,9 +15,11 @@
 //
 
 #include "params.h"
+#include <ctx/exceptions.hh>
 #include <ctx/CtxMap.hh>
 
 namespace libctx {
+using namespace ctx;
 
 params::params() : m_map_ptr{new CtxMap{}}, m_subtree_cache{} {}
 
@@ -26,6 +28,8 @@ params::params(const CtxMap& map) : params() {
     m_map_ptr->update(kv.key(), kv.value<std::string>());
   }
 }
+
+params::params(const params& other)  : params(*other.m_map_ptr) {}
 
 params::~params() {
   delete m_map_ptr;
@@ -152,5 +156,7 @@ std::ostream& operator<<(std::ostream& os, const params& p) {
 
   return os;
 }
+
+void throw_type_mismatch(const std::string& str) { throw type_mismatch(str); }
 
 }  // namespace libctx

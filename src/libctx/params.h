@@ -16,7 +16,6 @@
 
 #pragma once
 
-#include <ctx/exceptions.hh>
 #include <iostream>
 #include <map>
 #include <sstream>
@@ -27,12 +26,11 @@
 //       needed to compile this file.
 
 namespace ctx {
-/** Forward declaration to avoid using ctx/CtxMap header (and thus C++11 */
+/** Forward declaration to avoid using ctx/CtxMap header (and thus C++11) */
 class CtxMap;
 }  // namespace ctx
 
 namespace libctx {
-using namespace ctx;
 
 /** \brief Routine parameters
  *
@@ -56,10 +54,10 @@ class params {
    *       i.e. all keys should map to a value type of
    *       std::string
    */
-  explicit params(const CtxMap& map);
+  explicit params(const ctx::CtxMap& map);
 
   /** \brief Create a deep copy of a parameter tree */
-  params(const params& other) : params(*other.m_map_ptr) {}
+  params(const params& other);
 
   /** Assignment operator */
   params& operator=(params p);
@@ -121,13 +119,13 @@ class params {
    * map, i.e. you need to access the data via the at<std::string>
    * function.
    */
-  CtxMap& map() { return *m_map_ptr; }
+  ctx::CtxMap& map() { return *m_map_ptr; }
 
   /** Get the underlying parameter map. (Const version)
    *
    * See non-const version above for details.
    */
-  const CtxMap& map() const { return *m_map_ptr; }
+  const ctx::CtxMap& map() const { return *m_map_ptr; }
 
   /** Parse the value referred to by the key to a vector of
    *  arbitrary type and return it.
@@ -166,11 +164,18 @@ class params {
   }
 
   //! The CtxMap representing this tree. Contains only strings.
-  CtxMap* m_map_ptr;
+  ctx::CtxMap* m_map_ptr;
 
   //! Cache for subtree objects.
   mutable std::map<std::string, params> m_subtree_cache;
 };
+
+/** Helper function to throw a ctx::type_mismatch exception
+ *
+ * Needed to hide the ctx interface from this header and make it
+ * compile smoothly without C++11.
+ **/
+void throw_type_mismatch(const std::string& str);
 
 //
 // ------------------------------------------------------------------
@@ -178,9 +183,10 @@ class params {
 
 template <typename T>
 T params::get(const std::string& key) const {
+  std::istringstream ss (get_str(key));
   T t;
-  if (!(std::istringstream(get_str(key)) >> t)) {
-    throw type_mismatch("Could not convert the value \"" + get_str(key) +
+  if (!(ss >> t)) {
+    throw_type_mismatch("Could not convert the value \"" + get_str(key) +
                         "\" for key \"" + key + "\" to the requested type.");
   }
   return t;
@@ -190,7 +196,7 @@ template <typename T>
 void params::set(const std::string& key, const T& val) {
   std::ostringstream ss;
   if (!(ss << val)) {
-    throw type_mismatch("Could not convert the value for key \"" + key + "\" to string.");
+    throw_type_mismatch("Could not convert the value for key \"" + key + "\" to string.");
   }
   set(key, ss.str());
 }
@@ -207,10 +213,10 @@ std::vector<T> params::get_vec(const std::string& key) const {
     T val;
     ss >> val >> std::ws;
     if (!ss) {
-      throw type_mismatch("Could not convert the value \"" + get_str(key) +
+      throw_type_mismatch("Could not convert the value \"" + get_str(key) +
                           "\" for key \"" + key + "\" to the requested type.");
     }
-    ret.push_back(std::move(val));
+    ret.push_back(val);
   }
   return ret;
 }

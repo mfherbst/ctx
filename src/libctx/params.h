@@ -16,12 +16,20 @@
 
 #pragma once
 
-#include <ctx/CtxMap.hh>
 #include <ctx/exceptions.hh>
 #include <iostream>
 #include <map>
 #include <sstream>
 #include <vector>
+
+// Note: Instead of using smart std::unique_ptr<CtxMap>, this implementation
+//       deliberately uses raw CtxMap pointers to make sure that C++11 is not
+//       needed to compile this file.
+
+namespace ctx {
+/** Forward declaration to avoid using ctx/CtxMap header (and thus C++11 */
+class CtxMap;
+}  // namespace ctx
 
 namespace libctx {
 using namespace ctx;
@@ -33,12 +41,10 @@ using namespace ctx;
  */
 class params {
  public:
-  typedef CtxMap::const_iterator const_iterator;
-
   /**  \name Constructors */
   ///@{
-  /**	\brief Create an empty parameter tree */
-  params() : m_map_ptr{new CtxMap{}}, m_subtree_cache{} {}
+  /** \brief Create an empty parameter tree */
+  params();
 
   /** Create a deep copy of a CtxMap.
    *
@@ -50,23 +56,16 @@ class params {
    *       i.e. all keys should map to a value type of
    *       std::string
    */
-  explicit params(const CtxMap& map) : params() {
-    for (auto& kv : map) {
-      m_map_ptr->update(kv.key(), kv.value<std::string>());
-    }
-  }
+  explicit params(const CtxMap& map);
 
-  /**	\brief Create a deep copy of a parameter tree */
+  /** \brief Create a deep copy of a parameter tree */
   params(const params& other) : params(*other.m_map_ptr) {}
 
-  params(params&& other) = default;
-
   /** Assignment operator */
-  params& operator=(params p) {
-    m_map_ptr = std::move(p.m_map_ptr);
-    m_subtree_cache.clear();
-    return *this;
-  }
+  params& operator=(params p);
+
+  /** Destructor */
+  ~params();
   ///@}
 
   /** \name Existence checks */
@@ -77,19 +76,8 @@ class params {
   /**	\brief Returns true if a value with a given key exists,
           false otherwise.
    **/
-  bool key_exists(const std::string& key) const {
-    // The key indentifies a value if it plainly exists and returns a value:
-    return m_map_ptr->exists(key);
-  }
+  bool key_exists(const std::string& key) const;
   ///@}
-
-  /** \name Get data */
-  ///@{
-  //  /** \brief Returns iterator to start of the key range */
-  //  const_iterator begin() const { return m_map_ptr->begin(); }
-  //
-  //  /** \brief Returns iterator to end */
-  //  const_iterator end() const { return m_map_ptr->end(); }
 
   /** \brief Return a subtree (const version)
    *
@@ -108,9 +96,7 @@ class params {
   const std::string& get(const std::string& key) const { return get_str(key); }
 
   /** Return the value indentified by a key as a plain string. */
-  const std::string& get_str(const std::string& key) const {
-    return m_map_ptr->at<std::string>(key);
-  }
+  const std::string& get_str(const std::string& key) const;
 
   /**  Convert the string value referenced by key to the requestet type ``T``
    *   and return the result.
@@ -118,28 +104,22 @@ class params {
   template <typename T>
   T get(const std::string& key) const;
 
-  ///@}
-
   /** Set an entry. The value is converted to a string before setting it. */
   template <typename T>
   void set(const std::string& key, const T& value);
 
   /** Set an entry. */
-  void set(const std::string& key, const std::string& value) {
-    if (key.find('/') != std::string::npos) {
-      throw invalid_argument("Key should not contain the \"/\" character.");
-    }
-    m_map_ptr->update(key, value);
-  }
+  void set(const std::string& key, const std::string& value);
 
   /** Erase a single key if it exists. Nothing happens if the key is absent */
-  void erase_value(const std::string& key) { m_map_ptr->erase(key); }
+  void erase_value(const std::string& key);
 
   /** Get the underlying parameter map.
    *
    * Note that all data is stored
-   * as strings, so you will only able to get<std::string> from
-   * the map.
+   * as strings, so you will only be able to get strings from the
+   * map, i.e. you need to access the data via the at<std::string>
+   * function.
    */
   CtxMap& map() { return *m_map_ptr; }
 
@@ -181,17 +161,12 @@ class params {
   friend std::ostream& operator<<(std::ostream& os, const params& p);
 
  private:
-  /** Internal constructor to make a params object from an already existent
-   *  pointer to a  CtxMap */
-  params(std::unique_ptr<CtxMap> map_ptr)
-        : m_map_ptr(std::move(map_ptr)), m_subtree_cache() {}
-
   std::string normalise_key(const std::string& raw_key) const {
     return raw_key[0] == '/' ? raw_key : "/" + raw_key;
   }
 
   //! The CtxMap representing this tree. Contains only strings.
-  std::unique_ptr<CtxMap> m_map_ptr;
+  CtxMap* m_map_ptr;
 
   //! Cache for subtree objects.
   mutable std::map<std::string, params> m_subtree_cache;

@@ -19,6 +19,9 @@
 
 namespace ctx {
 
+// TODO Generalise into a static map where a user can
+//      register check and conversion functions
+
 #define IF_TYPE_PRINT(TYPE)                                              \
   if (value.type_name_raw() == std::string(typeid(TYPE).name()) ||       \
       value.type_name_raw() == std::string(typeid(const TYPE).name())) { \

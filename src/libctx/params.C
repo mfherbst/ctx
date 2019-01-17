@@ -15,8 +15,31 @@
 //
 
 #include "params.h"
+#include <ctx/CtxMap.hh>
 
 namespace libctx {
+
+params::params() : m_map_ptr{new CtxMap{}}, m_subtree_cache{} {}
+
+params::params(const CtxMap& map) : params() {
+  for (auto& kv : map) {
+    m_map_ptr->update(kv.key(), kv.value<std::string>());
+  }
+}
+
+params::~params() {
+  delete m_map_ptr;
+  m_map_ptr = nullptr;
+}
+
+params& params::operator=(params p) {
+  delete m_map_ptr;
+  m_map_ptr   = p.m_map_ptr;
+  p.m_map_ptr = nullptr;
+
+  m_subtree_cache.clear();
+  return *this;
+}
 
 bool params::subtree_exists(const std::string& key) const {
   const std::string normalised = normalise_key(key);
@@ -30,6 +53,11 @@ bool params::subtree_exists(const std::string& key) const {
     }
   }
   return false;
+}
+
+bool params::key_exists(const std::string& key) const {
+  // The key indentifies a value if it plainly exists and returns a value:
+  return m_map_ptr->exists(key);
 }
 
 const params& params::get_subtree(const std::string& key) const {
@@ -55,16 +83,34 @@ params& params::get_subtree(const std::string& key) {
   // yet, we need to create it first
   auto it = m_subtree_cache.find(normalised);
   if (it == std::end(m_subtree_cache)) {
-    // Create the new parameter object.
-    params p(std::unique_ptr<CtxMap>(new CtxMap(m_map_ptr->submap(normalised))));
+    // Create the new parameter object and the new subtree
+    CtxMap* submap_ptr = new CtxMap(m_map_ptr->submap(normalised));
+    auto it            = m_subtree_cache.insert({normalised, params{}}).first;
 
-    // Move in inside the subtree
-    auto it = m_subtree_cache.emplace(std::move(normalised), std::move(p)).first;
+    // Replace CtxMap object of the subtree by the one we made as a submap above
+    auto& it_params = it->second;
+    delete it_params.m_map_ptr;
+    it_params.m_map_ptr = submap_ptr;
+    submap_ptr          = nullptr;
+
     return it->second;
   } else {
     return it->second;
   }
 }
+
+const std::string& params::get_str(const std::string& key) const {
+  return m_map_ptr->at<std::string>(key);
+}
+
+void params::set(const std::string& key, const std::string& value) {
+  if (key.find('/') != std::string::npos) {
+    throw invalid_argument("Key should not contain the \"/\" character.");
+  }
+  m_map_ptr->update(key, value);
+}
+
+void params::erase_value(const std::string& key) { m_map_ptr->erase(key); }
 
 params& params::merge_subtree(const std::string& key, const params& from) {
   if (key.empty()) {

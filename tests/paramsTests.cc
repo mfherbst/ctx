@@ -15,6 +15,7 @@
 //
 
 #include <catch2/catch.hpp>
+#include <ctx/CtxMap.hh>
 #include <libctx/params.h>
 
 namespace ctx {

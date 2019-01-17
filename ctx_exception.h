@@ -15,10 +15,14 @@
 //
 
 #pragma once
-#include "context.h"
-#include "ctx_ptr.h"
-#include "ctx_exception.h"
-#include "ctx_ref.h"
-#include "params.h"
-#include "rc_ptr.h"
-#include "root_storage.h"
+#include <exception>
+#include <stdexcept>
+
+namespace libctx {
+  /** Typedef of the most useful exception parent class
+   *
+   * \note This type is deprecated and should not be used any more.
+   *       It is only provided for backward-compatibility with libctx.
+   **/
+  typedef std::logic_error ctx_exception;
+}

@@ -19,6 +19,13 @@
 cmake_minimum_required(VERSION 3.2.0)
 cmake_policy(VERSION 3.2.0)
 
+if (DEFINED QCHEM_SOURCE_DIR)
+	include(cmake/SetupBuildQChem.cmake)
+	# Stop processing this file, since all setup is done in the
+	# included file instead.
+	return()
+endif()
+
 ##########################################################################
 # Project setup
 

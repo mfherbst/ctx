@@ -31,6 +31,9 @@ set_target_properties(ctx PROPERTIES VERSION "${PROJECT_VERSION}")
 #
 # Installation
 #
+if (DEFINED CTX_BUILD_FROM_QCHEM AND CTX_BUILD_FROM_QCHEM)
+	return()  # No installation if built along Q-Chem
+endif()
 
 # set the installation property for these targets:
 install(TARGETS ctx

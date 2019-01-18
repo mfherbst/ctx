@@ -15,14 +15,11 @@
 //
 
 #pragma once
-#include <exception>
-#include <stdexcept>
+#include <ctx/CtxExceptionBase.hh>
 
 namespace libctx {
-  /** Typedef of the most useful exception parent class
-   *
-   * \note This type is deprecated and should not be used any more.
-   *       It is only provided for backward-compatibility with libctx.
-   **/
-  typedef std::logic_error ctx_exception;
-}
+
+/** Typedef to the common base class of all exceptions used in ctx */
+typedef ctx::CtxExceptionBase ctx_exception;
+
+}  // namespace libctx

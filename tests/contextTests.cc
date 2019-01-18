@@ -16,6 +16,7 @@
 
 #include <catch2/catch.hpp>
 #include <libctx/context.h>
+#include <libctx/ctx_exception.h>
 
 namespace ctx {
 using namespace libctx;
@@ -199,6 +200,20 @@ TEST_CASE("Test context", "[context]") {
     REQUIRE(*ctx.get<std::string>("tree/string") == "blubber");
     REQUIRE(*ctx2.get<int>("d") == 0);
   }
+
+#ifndef TEST_QCHEM_LIBCTX
+  SECTION("Test various exception throws") {
+    CtxMap stor{{"tree/data", 39}, {"tree/string", "string"}};
+    context ctx(stor);
+
+    REQUIRE_THROWS_AS(ctx.get<std::string>("tree/data"), ctx::type_mismatch);
+    REQUIRE_THROWS_AS(ctx.get<std::string>("tree/data"), libctx::ctx_exception);
+
+    REQUIRE_THROWS_AS(ctx.get<std::string>("tree/strng"), ctx::out_of_range);
+    REQUIRE_THROWS_AS(ctx.get<std::string>("tree/strng"), std::out_of_range);
+    REQUIRE_THROWS_AS(ctx.get<std::string>("tree/strng"), libctx::ctx_exception);
+  }
+#endif  // TEST_QCHEM_LIBCTX
 }  // testcace context
 
 }  // namespace tests

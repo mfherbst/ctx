@@ -53,8 +53,8 @@ class context {
   template <typename T>
   void insert(const std::string& key, rc_ptr<T> ptr) {
     if (m_map_ptr->exists(key)) {
-      throw invalid_argument("Key '" + key +
-                             "' already exists. Use update() to update its value.");
+      throw ctx::invalid_argument("Key '" + key +
+                                  "' already exists. Use update() to update its value.");
     }
     m_map_ptr->update(key, ptr);
   }
@@ -64,7 +64,7 @@ class context {
   template <typename T>
   void update(const std::string& key, rc_ptr<T> ptr) {
     if (!m_map_ptr->exists(key)) {
-      throw out_of_range("Key '" + key + "' is not known.");
+      throw ctx::out_of_range("Key '" + key + "' is not known.");
     }
     m_map_ptr->update(key, ptr);
   }

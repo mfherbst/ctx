@@ -26,7 +26,7 @@ void context::erase(const std::string& key) {
 }
 
 void context::copy(const std::string& key_from, context& to, const std::string& key_to) {
-  if (m_map_ptr->exists(key_to)) {
+  if (to.m_map_ptr->exists(key_to)) {
     throw invalid_argument("Target key '" + key_to + "' already exists.");
   }
   to.m_map_ptr->update(key_to, m_map_ptr->at_raw_value(key_from));

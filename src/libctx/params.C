@@ -15,8 +15,8 @@
 //
 
 #include "params.h"
-#include <ctx/exceptions.hh>
 #include <ctx/CtxMap.hh>
+#include <ctx/exceptions.hh>
 
 namespace libctx {
 using namespace ctx;
@@ -29,7 +29,7 @@ params::params(const CtxMap& map) : params() {
   }
 }
 
-params::params(const params& other)  : params(*other.m_map_ptr) {}
+params::params(const params& other) : params(*other.m_map_ptr) {}
 
 params::~params() {
   delete m_map_ptr;
@@ -68,39 +68,7 @@ const params& params::get_subtree(const std::string& key) const {
   if (!subtree_exists(key)) {
     throw out_of_range("Subtree key  '" + key + "' is not known.");
   }
-
-  auto it = m_subtree_cache.find(normalise_key(key));
-  if (it == std::end(m_subtree_cache)) {
-    throw internal_error("Unexpectedly could not find key '" + key +
-                         "' in subtree cache'");
-  }
-  return it->second;
-}
-
-params& params::get_subtree(const std::string& key) {
-  if (key.find('/') != std::string::npos) {
-    throw invalid_argument("Key should not contain the \"/\" character.");
-  }
-  const std::string normalised = normalise_key(key);
-
-  // If the subtree cache does not have the required params object for the subtree
-  // yet, we need to create it first
-  auto it = m_subtree_cache.find(normalised);
-  if (it == std::end(m_subtree_cache)) {
-    // Create the new parameter object and the new subtree
-    CtxMap* submap_ptr = new CtxMap(m_map_ptr->submap(normalised));
-    auto it            = m_subtree_cache.insert({normalised, params{}}).first;
-
-    // Replace CtxMap object of the subtree by the one we made as a submap above
-    auto& it_params = it->second;
-    delete it_params.m_map_ptr;
-    it_params.m_map_ptr = submap_ptr;
-    submap_ptr          = nullptr;
-
-    return it->second;
-  } else {
-    return it->second;
-  }
+  return cached_subtree(key);
 }
 
 const std::string& params::get_str(const std::string& key) const {
@@ -155,6 +123,36 @@ std::ostream& operator<<(std::ostream& os, const params& p) {
   }
 
   return os;
+}
+
+std::string params::normalise_key(const std::string& raw_key) const {
+  return raw_key[0] == '/' ? raw_key : "/" + raw_key;
+}
+
+params& params::cached_subtree(const std::string& key) const {
+  if (key.find('/') != std::string::npos) {
+    throw invalid_argument("Key should not contain the \"/\" character.");
+  }
+  const std::string normalised = normalise_key(key);
+
+  // If the subtree cache does not have the required params object for the subtree
+  // yet, we need to create it first
+  auto it = m_subtree_cache.find(normalised);
+  if (it == std::end(m_subtree_cache)) {
+    // Create the new parameter object and the new subtree
+    CtxMap* submap_ptr = new CtxMap(m_map_ptr->submap(normalised));
+    auto it            = m_subtree_cache.insert({normalised, params{}}).first;
+
+    // Replace CtxMap object of the subtree by the one we made as a submap above
+    auto& it_params = it->second;
+    delete it_params.m_map_ptr;
+    it_params.m_map_ptr = submap_ptr;
+    submap_ptr          = nullptr;
+
+    return it->second;
+  } else {
+    return it->second;
+  }
 }
 
 void throw_type_mismatch(const std::string& str) { throw type_mismatch(str); }

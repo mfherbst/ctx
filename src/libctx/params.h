@@ -88,7 +88,7 @@ class params {
    *
    * Creates one if required.
    **/
-  params& get_subtree(const std::string& key);
+  params& get_subtree(const std::string& key) { return cached_subtree(key); }
 
   /** Return the value indentified by a key as a plain string. */
   const std::string& get(const std::string& key) const { return get_str(key); }
@@ -159,9 +159,11 @@ class params {
   friend std::ostream& operator<<(std::ostream& os, const params& p);
 
  private:
-  std::string normalise_key(const std::string& raw_key) const {
-    return raw_key[0] == '/' ? raw_key : "/" + raw_key;
-  }
+  std::string normalise_key(const std::string& raw_key) const;
+
+  /** Obtain a reference to a subtree from the subtree cache.
+   *  Make a new one in case of a cache miss. */
+  params& cached_subtree(const std::string& key) const;
 
   //! The CtxMap representing this tree. Contains only strings.
   ctx::CtxMap* m_map_ptr;
@@ -183,7 +185,7 @@ void throw_type_mismatch(const std::string& str);
 
 template <typename T>
 T params::get(const std::string& key) const {
-  std::istringstream ss (get_str(key));
+  std::istringstream ss(get_str(key));
   T t;
   if (!(ss >> t)) {
     throw_type_mismatch("Could not convert the value \"" + get_str(key) +

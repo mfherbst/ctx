@@ -392,12 +392,14 @@ TEST_CASE("CtxMap tests", "[genmap]") {
 
   SECTION("Check iterators with begin() and end()") {
     // Add data to map.
-    CtxMap m{{"tree/sub", s},  {"tree/i", i}, {"dum", dum},    {"tree/value", 9},
-             {"tree", "root"}, {"/", "god"},  {"/zzz", "end"}, {"/zz", "mend"}};
+    CtxMap m{{"tree/sub", s},   {"tree/i", i},       {"dum", dum},
+             {"tree/value", 9}, {"tree_ser", "abc"}, {"tree", "root"},
+             {"/", "god"},      {"/zzz", "end"},     {"/zz", "mend"}};
 
     // Check we get all keys for starters:
-    std::vector<std::string> ref{"/",         "/dum",        "/tree", "/tree/i",
-                                 "/tree/sub", "/tree/value", "/zz",   "/zzz"};
+    std::vector<std::string> ref{"/",         "/dum",      "/tree",
+                                 "/tree/i",   "/tree/sub", "/tree/value",
+                                 "/tree_ser", "/zz",       "/zzz"};
     auto itref = std::begin(ref);
     for (auto it = m.begin(); it != m.end(); ++it, ++itref) {
       REQUIRE(itref != std::end(ref));

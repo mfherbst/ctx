@@ -37,8 +37,17 @@ namespace ctx {
  */
 class CtxMap {
  public:
+  /** Custom comparator to sort key strings. Makes sure that slashes "/"
+   *  sort before any other character. */
+  struct key_comparator_type {
+    bool operator()(const std::string& x, const std::string& y) const;
+    typedef std::string first_argument_type;
+    typedef std::string second_argument_type;
+    typedef bool result_type;
+  };
+
   typedef CtxMapValue entry_value_type;
-  typedef std::map<std::string, entry_value_type> map_type;
+  typedef std::map<std::string, entry_value_type, key_comparator_type> map_type;
   typedef std::pair<const std::string, entry_value_type> entry_type;
   typedef CtxMapIterator<true> const_iterator;
   typedef CtxMapIterator<false> iterator;
@@ -479,28 +488,6 @@ class CtxMap {
    * */
   std::string make_full_key(const std::string& key) const;
 
-  /** Return an iterator which points to the first key-value pair where the key begins
-   * with the provided string ``start``.
-   *
-   * Together with map_starting_keys_end this allows to iterate over a range of
-   * values in the map, where the keys start with ``start``.
-   */
-  template <typename Map>
-  static auto starting_keys_begin(Map& map, const std::string& start)
-        -> decltype(std::begin(map)) {
-    return map.lower_bound(start);
-  }
-
-  /** Return an iterator which points to the first key-value pair where the key does
-   * not begin with the with the provided string ``start``.
-   *
-   * Together with map_starting_keys_begin this allows to iterate over a range of
-   * values in the map, where the keys start with ``start``.
-   */
-  template <typename Map>
-  static auto starting_keys_end(Map& map, const std::string& start)
-        -> decltype(std::end(map));
-
   std::shared_ptr<map_type> m_container_ptr;
 
   /** The location we are currently on in the tree
@@ -555,22 +542,6 @@ std::shared_ptr<const T> CtxMap::at_ptr(const std::string& key,
   } else {
     return itkey->second.get_ptr<T>();
   }
-}
-
-template <typename Map>
-auto CtxMap::starting_keys_end(Map& map, const std::string& start)
-      -> decltype(std::end(map)) {
-  // If start is empty, then we iterate over the full map:
-  if (start.length() == 0) return std::end(map);
-
-  // Seek to the first key-value pair which is no longer part
-  // of the range we care about, i.e. which does not start with the
-  // provided start string.
-  auto it = starting_keys_begin(map, start);
-  for (; it != std::end(map); ++it) {
-    if (0 != it->first.compare(0, start.length(), start)) break;
-  }
-  return it;
 }
 
 }  // namespace ctx

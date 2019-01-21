@@ -15,10 +15,63 @@
 //
 
 #include "CtxMap.hh"
+#include <algorithm>
 #include <iomanip>
 #include <vector>
 
 namespace ctx {
+
+namespace {
+/** Return an iterator which points to the first key-value pair where the key begins
+ * with the provided string ``start``.
+ *
+ * Together with subtree_keys_end this allows to iterate over a range of
+ * values in the map, where the keys start with ``start``.
+ */
+template <typename Map>
+auto subtree_keys_begin(Map& map, const std::string& start) -> decltype(std::begin(map)) {
+  return map.lower_bound(start);
+}
+
+/** Return an iterator which points to the first key-value pair where the key does
+ *  not begin with the with the provided string ``start``.
+ *
+ * Together with subtree_keys_begin this allows to iterate over a range of
+ * values in the map, where the keys start with ``start``.
+ */
+template <typename Map>
+auto subtree_keys_end(Map& map, const std::string& start) -> decltype(std::end(map)) {
+  // If start is empty, then we iterate over the full map:
+  if (start.length() == 0) return std::end(map);
+
+  // Seek to the first key-value pair which is no longer part
+  // of the range we care about, i.e. which does not compare less or equal
+  // with reference to start + "/" using the comparator of the map,
+  // which sorts "/" before any other character.
+  //
+  // Note that this is inclusive both with respect to the root of the subtree
+  // (just start) as well as exclusive compared to keys such as start + "_blabla".
+  // This is done in order to distinguish keys such as /subkey_bla from /subkey/bla,
+  // where the latter should be part of the range and the former not.
+  auto it = subtree_keys_begin(map, start);
+  CtxMap::key_comparator_type comp{};
+  for (; it != std::end(map); ++it) {
+    if (comp(start + "/", it->first.substr(0, start.length() + 1))) break;
+  }
+  return it;
+}
+}  // namespace
+
+bool CtxMap::key_comparator_type::operator()(const std::string& x,
+                                             const std::string& y) const {
+  return std::lexicographical_compare(
+        x.begin(), x.end(), y.begin(), y.end(), [](const char& lhs, const char& rhs) {
+          if (lhs == '/') return rhs != '/';  // '/' sorts before anything unless its '/'
+          if (rhs == '/') return false;
+          return lhs < rhs;
+        });
+}
+
 CtxMap& CtxMap::operator=(CtxMap other) {
   m_location      = std::move(other.m_location);
   m_container_ptr = std::move(other.m_container_ptr);
@@ -127,30 +180,32 @@ std::string CtxMap::make_full_key(const std::string& key) const {
 
 typename CtxMap::iterator CtxMap::begin(const std::string& path) {
   // Obtain iterator to the first key-value pair, which has a
-  // key starting with the full path.
+  // key starting with the full path plus a tailling "/" in order
+  // to distinguish a key such as /path/key from one such as /pathkey,
+  // with the former being included and the latter being excluded.
   //
   // (since the keys are sorted alphabetically in the map
   //  the ones which follow next must all be below our current
   //  location or already well past it.)
   const std::string path_full = make_full_key(path);
-  return iterator(starting_keys_begin(*m_container_ptr, path_full), path_full);
+  return iterator(subtree_keys_begin(*m_container_ptr, path_full), path_full);
 }
 
 typename CtxMap::const_iterator CtxMap::cbegin(const std::string& path) const {
   const std::string path_full = make_full_key(path);
-  return const_iterator(starting_keys_begin(*m_container_ptr, path_full), path_full);
+  return const_iterator(subtree_keys_begin(*m_container_ptr, path_full), path_full);
 }
 
 typename CtxMap::iterator CtxMap::end(const std::string& path) {
   // Obtain the first key which does no longer start with the pull path,
   // i.e. where we are done processing the subpath.
   const std::string path_full = make_full_key(path);
-  return iterator(starting_keys_end(*m_container_ptr, path_full), path_full);
+  return iterator(subtree_keys_end(*m_container_ptr, path_full), path_full);
 }
 
 typename CtxMap::const_iterator CtxMap::cend(const std::string& path) const {
   const std::string path_full = make_full_key(path);
-  return const_iterator(starting_keys_end(*m_container_ptr, path_full), path_full);
+  return const_iterator(subtree_keys_end(*m_container_ptr, path_full), path_full);
 }
 
 std::ostream& operator<<(std::ostream& o, const CtxMap& map) {

@@ -24,7 +24,7 @@ CHECK_CXX_SOURCE_COMPILES(
 	int main() {
 		const char* mangled = typeid(bool).name();
 		int status;
-		char*  demangled = abi::__cxa_demangle(mangled, nullptr, nullptr, &status);
+		char*  demangled = abi::__cxa_demangle(mangled, 0, 0, &status);
 		if(status == 0 and \"bool\" == std::string(demangled)) {
 			return 0;
 		}

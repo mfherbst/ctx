@@ -504,7 +504,7 @@ class CtxMap {
   std::shared_ptr<map_type> m_container_ptr;
 
   /** The location we are currently on in the tree
-   * may not end with a slash (but a full key like "/tree"
+   * may not end with a slash (but should be a full key like "/tree")
    */
   std::string m_location;
 };

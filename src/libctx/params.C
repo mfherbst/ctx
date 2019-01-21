@@ -29,28 +29,41 @@ params::params(const CtxMap& map) : params() {
   }
 }
 
-params::params(const params& other) : params(*other.m_map_ptr) {}
+params::params(const params& other) : params(*other.m_map_ptr) {
+  // Fill subtree cache exactly as in the copied object
+  for (auto& kv : other.m_subtree_cache) {
+    get_cached_subtree(kv.first);
+  }
+}
 
 params::~params() {
   delete m_map_ptr;
   m_map_ptr = nullptr;
 }
 
-params& params::operator=(params p) {
+params& params::operator=(params other) {
   delete m_map_ptr;
-  m_map_ptr   = p.m_map_ptr;
-  p.m_map_ptr = nullptr;
-
-  m_subtree_cache.clear();
+  m_map_ptr       = other.m_map_ptr;
+  other.m_map_ptr = nullptr;
+  m_subtree_cache = std::move(other.m_subtree_cache);
   return *this;
 }
 
 bool params::subtree_exists(const std::string& key) const {
+  if (key.find('/') != std::string::npos) {
+    throw invalid_argument("Key should not contain the \"/\" character.");
+  }
   const std::string normalised = normalise_key(key);
 
-  // The key identifies a subtree if keys of the kind
-  // key/${subkey} exist. So we go through the keys starting
-  // with the path "key" and check that this is the case
+  // If the key is in the subtree cache, then the subtree
+  // neccessarily exists
+  auto it = m_subtree_cache.find(normalised);
+  if (it != std::end(m_subtree_cache)) return true;
+
+  // Else we check the keys in the CtxMap.
+  // The input key identifies a subtree if keys of the kind
+  // ${input_key}/${subkey} exist. So we go through the keys starting
+  // with the path "${inupt_key}" and check that this is the case
   for (auto& kv : *m_map_ptr) {
     if (0 == kv.key().compare(0, normalised.length() + 1, normalised + "/")) {
       return true;
@@ -60,6 +73,9 @@ bool params::subtree_exists(const std::string& key) const {
 }
 
 bool params::key_exists(const std::string& key) const {
+  if (key.find('/') != std::string::npos) {
+    throw invalid_argument("Key should not contain the \"/\" character.");
+  }
   // The key indentifies a value if it plainly exists and returns a value:
   return m_map_ptr->exists(key);
 }
@@ -68,10 +84,33 @@ const params& params::get_subtree(const std::string& key) const {
   if (!subtree_exists(key)) {
     throw out_of_range("Subtree key  '" + key + "' is not known.");
   }
-  return cached_subtree(key);
+  if (key.find('/') != std::string::npos) {
+    throw invalid_argument("Key should not contain the \"/\" character.");
+  }
+  const std::string normalised = normalise_key(key);
+  return get_cached_subtree(normalised);
+}
+
+params& params::get_subtree(const std::string& key) {
+  if (key.find('/') != std::string::npos) {
+    throw invalid_argument("Key should not contain the \"/\" character.");
+  }
+  const std::string normalised = normalise_key(key);
+  return get_cached_subtree(normalised);
+}
+
+void params::create_subtree(const std::string& key) {
+  if (key.find('/') != std::string::npos) {
+    throw invalid_argument("Key should not contain the \"/\" character.");
+  }
+  const std::string normalised = normalise_key(key);
+  get_cached_subtree(normalised);
 }
 
 const std::string& params::get_str(const std::string& key) const {
+  if (key.find('/') != std::string::npos) {
+    throw invalid_argument("Key should not contain the \"/\" character.");
+  }
   return m_map_ptr->at<std::string>(key);
 }
 
@@ -82,7 +121,12 @@ void params::set(const std::string& key, const std::string& value) {
   m_map_ptr->update(key, value);
 }
 
-void params::erase_value(const std::string& key) { m_map_ptr->erase(key); }
+void params::erase_value(const std::string& key) {
+  if (key.find('/') != std::string::npos) {
+    throw invalid_argument("Key should not contain the \"/\" character.");
+  }
+  m_map_ptr->erase(key);
+}
 
 params& params::merge_subtree(const std::string& key, const params& from) {
   if (key.empty()) {
@@ -129,12 +173,7 @@ std::string params::normalise_key(const std::string& raw_key) const {
   return raw_key[0] == '/' ? raw_key : "/" + raw_key;
 }
 
-params& params::cached_subtree(const std::string& key) const {
-  if (key.find('/') != std::string::npos) {
-    throw invalid_argument("Key should not contain the \"/\" character.");
-  }
-  const std::string normalised = normalise_key(key);
-
+params& params::get_cached_subtree(const std::string& normalised) const {
   // If the subtree cache does not have the required params object for the subtree
   // yet, we need to create it first
   auto it = m_subtree_cache.find(normalised);

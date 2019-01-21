@@ -79,7 +79,7 @@ class params {
 
   /** \brief Return a subtree (const version)
    *
-   * Throws a ExcUnknownKey if the key does not refer
+   * Throws a out_of_range exception if the key does not refer
    * to a subtree
    **/
   const params& get_subtree(const std::string& key) const;
@@ -88,7 +88,13 @@ class params {
    *
    * Creates one if required.
    **/
-  params& get_subtree(const std::string& key) { return cached_subtree(key); }
+  params& get_subtree(const std::string& key);
+
+  /** \brief Explicitly create a subtree (without returning it).
+   *
+   * Does nothing in case the tree already exists.
+   */
+  void create_subtree(const std::string& key);
 
   /** Return the value indentified by a key as a plain string. */
   const std::string& get(const std::string& key) const { return get_str(key); }
@@ -163,7 +169,7 @@ class params {
 
   /** Obtain a reference to a subtree from the subtree cache.
    *  Make a new one in case of a cache miss. */
-  params& cached_subtree(const std::string& key) const;
+  params& get_cached_subtree(const std::string& normalised) const;
 
   //! The CtxMap representing this tree. Contains only strings.
   ctx::CtxMap* m_map_ptr;

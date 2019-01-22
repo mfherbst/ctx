@@ -284,6 +284,21 @@ TEST_CASE("Test params", "[params]") {
 
     params nested_copy(nested);
     REQUIRE(nested_copy.subtree_exists("data"));
+
+    REQUIRE(p.subtree_exists("any"));
+    REQUIRE(p.subtree_exists("new"));
+    REQUIRE(p.subtree_exists("some"));
+    REQUIRE(p.subtree_exists("nested"));
+    REQUIRE(p.get_subtree("nested").subtree_exists("data"));
+
+    params other;
+    other.map().update({{"more/one", "1"}, {"more/two", "2"}});
+    other.get_subtree("more");
+    copy.merge_subtree("blubb", other);
+    REQUIRE(copy.subtree_exists("blubb"));
+    REQUIRE(copy.get_subtree("blubb").subtree_exists("more"));
+
+    REQUIRE_FALSE(p.subtree_exists("blubb"));
   }
 }
 

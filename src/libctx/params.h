@@ -90,12 +90,6 @@ class params {
    **/
   params& get_subtree(const std::string& key);
 
-  /** \brief Explicitly create a subtree (without returning it).
-   *
-   * Does nothing in case the tree already exists.
-   */
-  void create_subtree(const std::string& key);
-
   /** Return the value indentified by a key as a plain string. */
   const std::string& get(const std::string& key) const { return get_str(key); }
 

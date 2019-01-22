@@ -41,6 +41,10 @@ struct internal_error : public runtime_error {
   using runtime_error::runtime_error;
 };
 
+struct not_implemented_error : public runtime_error {
+  using runtime_error::runtime_error;
+};
+
 #undef USING_STD_EXCEPTION
 
 }  // namespace ctx

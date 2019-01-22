@@ -17,6 +17,7 @@
 #include "params.h"
 #include <ctx/CtxMap.hh>
 #include <ctx/exceptions.hh>
+#include <functional>
 
 namespace libctx {
 using namespace ctx;
@@ -31,7 +32,7 @@ params::params(const CtxMap& map) : params() {
 
 params::params(const params& other) : params(*other.m_map_ptr) {
   // Fill subtree cache exactly as in the copied object
-  for (auto& kv : other.m_subtree_cache) {
+  for (const auto& kv : other.m_subtree_cache) {
     m_subtree_cache.insert(kv);
   }
 }
@@ -99,14 +100,6 @@ params& params::get_subtree(const std::string& key) {
   return get_cached_subtree(normalised);
 }
 
-void params::create_subtree(const std::string& key) {
-  if (key.find('/') != std::string::npos) {
-    throw invalid_argument("Key should not contain the \"/\" character.");
-  }
-  const std::string normalised = normalise_key(key);
-  get_cached_subtree(normalised);
-}
-
 const std::string& params::get_str(const std::string& key) const {
   if (key.find('/') != std::string::npos) {
     throw invalid_argument("Key should not contain the \"/\" character.");
@@ -135,11 +128,37 @@ params& params::merge_subtree(const std::string& key, const params& from) {
   if (key.find('/') != std::string::npos) {
     throw invalid_argument("Key should not contain the \"/\" character.");
   }
+  const std::string normalised = normalise_key(key);
 
-  // Perform a full deep copy of the from object
-  // and move this copy into ourself.
+  // Perform a full deep copy of the map contained in the from object
+  // and move this copy into ourself, this updates the key values.
   params copy(from);
   m_map_ptr->update(key, std::move(copy.map()));
+
+  // Replicate the subtree cache: For this recursively go through
+  // the subtree cache in the copy and make sure we have those
+  // subtrees present in the cache of this object as well.
+  auto it = m_subtree_cache.find(normalised);
+  if (it != std::end(m_subtree_cache)) {
+    throw not_implemented_error(
+          "Merging subtrees, where the destination subtree is already contained in the "
+          "params subtree cache is not yet implemented.");
+  }
+
+  using stc_iterator = typename std::map<std::string, params>::iterator;
+  std::function<void(params&, stc_iterator, stc_iterator)> replicate_subtree_cache;
+  replicate_subtree_cache = [&replicate_subtree_cache](params& p, stc_iterator begin,
+                                                       stc_iterator end) {
+    for (auto it = begin; it != end; ++it) {
+      params& sub = p.get_cached_subtree(it->first);
+      replicate_subtree_cache(sub, it->second.m_subtree_cache.begin(),
+                              it->second.m_subtree_cache.end());
+    }
+  };
+  params& subtree = get_cached_subtree(normalised);
+  replicate_subtree_cache(subtree, copy.m_subtree_cache.begin(),
+                          copy.m_subtree_cache.end());
+
   return get_subtree(key);
 }
 

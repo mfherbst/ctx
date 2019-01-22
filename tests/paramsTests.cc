@@ -261,6 +261,30 @@ TEST_CASE("Test params", "[params]") {
     REQUIRE(merged.get_subtree("any").get<int>("above") == 4);
     REQUIRE(merged.get<std::string>("extra") == "pi");
   }
+
+  SECTION("Test workflow with subtree cache generation") {
+    params p;
+    p.map().update({{"some/any", "2"}});
+    p.get_subtree("any");
+    p.get_subtree("new").set("stuff", 3);
+    params& nested = p.get_subtree("nested");
+    nested.get_subtree("data");
+
+    REQUIRE(p.subtree_exists("any"));
+    REQUIRE(p.subtree_exists("new"));
+    REQUIRE(p.subtree_exists("some"));
+    REQUIRE(p.subtree_exists("nested"));
+    REQUIRE(p.get_subtree("nested").subtree_exists("data"));
+
+    params copy(p);
+    REQUIRE(copy.subtree_exists("any"));
+    REQUIRE(copy.subtree_exists("new"));
+    REQUIRE(copy.subtree_exists("some"));
+    REQUIRE(copy.get_subtree("nested").subtree_exists("data"));
+
+    params nested_copy(nested);
+    REQUIRE(nested_copy.subtree_exists("data"));
+  }
 }
 
 }  // namespace tests

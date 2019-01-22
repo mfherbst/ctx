@@ -32,7 +32,7 @@ params::params(const CtxMap& map) : params() {
 params::params(const params& other) : params(*other.m_map_ptr) {
   // Fill subtree cache exactly as in the copied object
   for (auto& kv : other.m_subtree_cache) {
-    get_cached_subtree(kv.first);
+    m_subtree_cache.insert(kv);
   }
 }
 

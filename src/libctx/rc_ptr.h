@@ -23,22 +23,43 @@ class rc_ptr : public std::shared_ptr<T> {
  public:
   typedef std::shared_ptr<T> base_type;
 
-  // Import base constructors:
-  using base_type::shared_ptr;
+  //@{
+  /** Default constructor */
+  constexpr rc_ptr() noexcept : base_type() {}
+  constexpr rc_ptr(std::nullptr_t) : base_type() {}
+  //@}
 
+  // Default copy and move constructors
+  rc_ptr(const rc_ptr& x) = default;
+  rc_ptr(rc_ptr&& x)      = default;
+
+  /** Initialise from unique pointer */
+  template <class U, class D>
+  rc_ptr(std::unique_ptr<U, D>&& p) : base_type(std::forward<std::unique_ptr<U, D>>(p)) {}
+
+  // TODO The next constructor should be made explicit
+  //      to avoid capturing a pointer twice, but for
+  //      compatibility it is unfortunately needed like so.
   /** Construct rc_ptr implicitly from pointer */
-  rc_ptr(T* ptr = nullptr) : base_type(ptr) {}
+  rc_ptr(T* ptr) : base_type(ptr) {}
 
   /** Implictly construct from shared pointer */
-  rc_ptr(std::shared_ptr<T> p) : base_type(std::move(p)) {}
+  rc_ptr(std::shared_ptr<T> p) : base_type(p) {}
 
-// We know this is deprecated, but since we need the interface,
-// it has to stick for know, unfortunately.
+// TODO auto_ptr is deprecated, but since we need the interface,
+// it has to stick for know, unfortunately. Also, getting the
+// auto_ptr by reference and releasing the contained pointer could
+// potentially lead to segfaults and other nasty side effects,
+// so this way of constructing an rc_ptr should really be removed.
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   template <typename U>
   explicit rc_ptr(std::auto_ptr<U>& p) : base_type(p.release()) {}
 #pragma GCC diagnostic pop
+
+  // Default assignment operators
+  rc_ptr& operator=(const rc_ptr& in) = default;
+  rc_ptr& operator=(rc_ptr&&) = default;
 
   /** A pointer equivalent to nullptr */
   static const std::shared_ptr<T> null_ptr;

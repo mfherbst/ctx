@@ -62,8 +62,7 @@ cmake --version
 ninja --version
 ${CC} --version
 ${CXX} --version
-
-echo "$CXX_FLAGS"
+echo "CXX_FLAGS: $CXX_FLAGS"
 
 # --------------------------------------------------------------
 # Configure and build

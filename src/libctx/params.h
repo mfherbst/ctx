@@ -162,8 +162,9 @@ class params {
   std::string normalise_key(const std::string& raw_key) const;
 
   /** Obtain a reference to a subtree from the subtree cache.
-   *  Make a new one in case of a cache miss. */
-  params& get_cached_subtree(const std::string& normalised) const;
+   *  Make a new one in case of a cache miss or if force_renew is true. */
+  params& get_cached_subtree(const std::string& normalised,
+                             bool force_renew = false) const;
 
   //! The CtxMap representing this tree. Contains only strings.
   ctx::CtxMap* m_map_ptr;

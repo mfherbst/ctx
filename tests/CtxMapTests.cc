@@ -14,6 +14,7 @@
 // limitations under the License.
 //
 
+#include <array>
 #include <catch2/catch.hpp>
 #include <ctx/CheaplyCopyable_i.hh>
 #include <ctx/CtxMap.hh>

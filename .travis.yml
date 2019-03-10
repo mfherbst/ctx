@@ -21,6 +21,10 @@ compiler:
   - clang
   - gcc
 
+os:
+  - osx
+  - linux
+
 branches:
   only:
     - master
@@ -35,5 +39,9 @@ addons:
   apt:
     packages:
       - ninja-build
+  homebrew:
+    packages:
+      - ninja
+
 
 script: ci/build.sh

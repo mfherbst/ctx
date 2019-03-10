@@ -138,24 +138,19 @@ params& params::merge_subtree(const std::string& key, const params& from) {
   // Replicate the subtree cache: For this recursively go through
   // the subtree cache in the copy and make sure we have those
   // subtrees present in the cache of this object as well.
-  auto it = m_subtree_cache.find(normalised);
-  if (it != std::end(m_subtree_cache)) {
-    throw not_implemented_error(
-          "Merging subtrees, where the destination subtree is already contained in the "
-          "params subtree cache is not yet implemented.");
-  }
-
   using stc_iterator = typename std::map<std::string, params>::iterator;
   std::function<void(params&, stc_iterator, stc_iterator)> replicate_subtree_cache;
   replicate_subtree_cache = [&replicate_subtree_cache](params& p, stc_iterator begin,
                                                        stc_iterator end) {
     for (auto it = begin; it != end; ++it) {
-      params& sub = p.get_cached_subtree(it->first);
+      // Recursively go down to the next level
+      params& sub = p.get_cached_subtree(it->first, /* force_renew = */ true);
       replicate_subtree_cache(sub, it->second.m_subtree_cache.begin(),
                               it->second.m_subtree_cache.end());
     }
   };
-  params& subtree = get_cached_subtree(normalised);
+
+  params& subtree = get_cached_subtree(normalised, /* force_renew = */ true);
   replicate_subtree_cache(subtree, copy.m_subtree_cache.begin(),
                           copy.m_subtree_cache.end());
 
@@ -192,11 +187,19 @@ std::string params::normalise_key(const std::string& raw_key) const {
   return raw_key[0] == '/' ? raw_key : "/" + raw_key;
 }
 
-params& params::get_cached_subtree(const std::string& normalised) const {
-  // If the subtree cache does not have the required params object for the subtree
-  // yet, we need to create it first
+params& params::get_cached_subtree(const std::string& normalised,
+                                   bool force_renew) const {
   auto it = m_subtree_cache.find(normalised);
-  if (it == std::end(m_subtree_cache)) {
+
+  // If force_renew than we delete what we have at the moment
+  if (force_renew && it != std::end(m_subtree_cache)) {
+    m_subtree_cache.erase(it);
+    it = std::end(m_subtree_cache);
+  }
+
+  // If the subtree cache does not yet or not any more
+  // have the required params object for the subtree, we create it first
+  if (force_renew || it == std::end(m_subtree_cache)) {
     // Create the new parameter object and the new subtree
     CtxMap* submap_ptr = new CtxMap(m_map_ptr->submap(normalised));
     auto it            = m_subtree_cache.insert({normalised, params{}}).first;

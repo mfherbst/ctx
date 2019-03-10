@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <ctx/demangle.hh>
 #include <iostream>
 #include <map>
 #include <sstream>
@@ -162,8 +163,9 @@ class params {
   std::string normalise_key(const std::string& raw_key) const;
 
   /** Obtain a reference to a subtree from the subtree cache.
-   *  Make a new one in case of a cache miss. */
-  params& get_cached_subtree(const std::string& normalised) const;
+   *  Make a new one in case of a cache miss or if force_renew is true. */
+  params& get_cached_subtree(const std::string& normalised,
+                             bool force_renew = false) const;
 
   //! The CtxMap representing this tree. Contains only strings.
   ctx::CtxMap* m_map_ptr;
@@ -207,16 +209,19 @@ template <typename T>
 std::vector<T> params::get_vec(const std::string& key) const {
   if (!key_exists(key)) return std::vector<T>();
 
+  // Get the key value and add a terminating white space
   std::vector<T> ret;
-  std::istringstream ss(get_str(key));
+  std::istringstream ss(get_str(key) + " ");
   ss >> std::ws;  // Skip leading whitespace.
 
   while (!ss.eof()) {
     T val;
     ss >> val >> std::ws;
     if (!ss) {
-      throw_type_mismatch("Could not convert the value \"" + get_str(key) +
-                          "\" for key \"" + key + "\" to the requested type.");
+      throw_type_mismatch(
+            "Could not convert the value \"" + get_str(key) + "\" for key \"" + key +
+            "\" to the requested type vector<" + ctx::demangle(typeid(T)) +
+            ">. Error occurred for parsing value '" + std::to_string(val) + "'.");
     }
     ret.push_back(val);
   }

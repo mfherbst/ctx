@@ -19,6 +19,7 @@
 # The sources for the test executable
 set(CTX_TESTS_SOURCES
 	CtxMapTests.cc
+	rc_ptrTests.cc
 	contextTests.cc
 	ctx_ptrTests.cc
 	ctx_refTests.cc

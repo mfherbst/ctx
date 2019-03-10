@@ -121,7 +121,7 @@ TEST_CASE("Test params", "[params]") {
     std::vector<int> vint;
     p.get_vec("d", vint);
 #else
-    auto vint  = p.get_vec<int>("d");
+    auto vint = p.get_vec<int>("d");
 #endif
     REQUIRE(vint.size() == 2);
     REQUIRE(vint[0] == 1);
@@ -129,9 +129,11 @@ TEST_CASE("Test params", "[params]") {
 
     p.set("d", "\n  1.1e4   -9 \n 0.4 \n\n 19.44");
 #ifdef TEST_QCHEM_LIBCTX
+    REQUIRE_THROWS(p.get_vec<int>("d", vint));
     std::vector<double> vdbl;
     p.get_vec("d", vdbl);
 #else
+    REQUIRE_THROWS(p.get_vec<int>("d"));
     auto vdbl  = p.get_vec<double>("d");
 #endif
     REQUIRE(vdbl.size() == 4);
@@ -267,6 +269,8 @@ TEST_CASE("Test params", "[params]") {
     p.map().update({{"some/any", "2"}});
     p.get_subtree("any");
     p.get_subtree("new").set("stuff", 3);
+    params& tnew = p.get_subtree("new");
+    tnew.get_subtree("inner").set("value", 42);
     params& nested = p.get_subtree("nested");
     nested.get_subtree("data");
 
@@ -299,6 +303,78 @@ TEST_CASE("Test params", "[params]") {
     REQUIRE(copy.get_subtree("blubb").subtree_exists("more"));
 
     REQUIRE_FALSE(p.subtree_exists("blubb"));
+
+    // Another merge into existing subtree
+    copy.merge_subtree("new", other);
+    REQUIRE(p.subtree_exists("new"));
+    REQUIRE_FALSE(p.get_subtree("new").subtree_exists("more"));
+    REQUIRE(p.get_subtree("new").get<int>("stuff") == 3);
+    REQUIRE(p.get_subtree("new").subtree_exists("inner"));
+    REQUIRE(p.get_subtree("new").get_subtree("inner").get<int>("value") == 42);
+
+    REQUIRE(copy.subtree_exists("new"));
+    REQUIRE(copy.get_subtree("new").get<int>("stuff") == 3);
+    REQUIRE(copy.get_subtree("new").get<int>("stuff") == 3);
+    REQUIRE(copy.get_subtree("new").subtree_exists("inner"));
+    REQUIRE(copy.get_subtree("new").get_subtree("inner").get<int>("value") == 42);
+
+    REQUIRE(copy.get_subtree("new").subtree_exists("more"));
+    REQUIRE(copy.get_subtree("new").get_subtree("more").get<int>("one") == 1);
+    REQUIRE(copy.get_subtree("new").get_subtree("more").get<int>("two") == 2);
+
+    REQUIRE_FALSE(other.subtree_exists("inner"));
+  }
+
+  SECTION("Subtree merge with overwrite") {
+    params p;
+    p.get_subtree("top").get_subtree("one").set("one", 11);
+    p.get_subtree("top").get_subtree("one").set("two", 12);
+    p.get_subtree("top").get_subtree("two").set("one", 21);
+    p.get_subtree("other").set("other", "other");
+
+    params values;
+    values.get_subtree("one").set("one", 1011);
+    values.get_subtree("one").set("four", 14);
+    values.get_subtree("three").set("three", 33);
+
+    params copy(p);
+    copy.merge_subtree("top", values);
+
+    // Check consistency of p
+    REQUIRE(p.subtree_exists("top"));
+    REQUIRE(p.get_subtree("top").subtree_exists("one"));
+    REQUIRE(p.get_subtree("top").get_subtree("one").get<int>("one") == 11);
+    REQUIRE(p.get_subtree("top").get_subtree("one").get<int>("two") == 12);
+    REQUIRE(p.get_subtree("top").subtree_exists("two"));
+    REQUIRE(p.get_subtree("top").get_subtree("two").get<int>("one") == 21);
+    REQUIRE(p.subtree_exists("other"));
+    REQUIRE(p.get_subtree("other").get<std::string>("other") == "other");
+    REQUIRE_FALSE(p.get_subtree("top").subtree_exists("three"));
+    REQUIRE_FALSE(p.get_subtree("top").get_subtree("one").key_exists("four"));
+    REQUIRE_FALSE(p.subtree_exists("three"));
+
+    // Check consistency of values
+    REQUIRE(values.subtree_exists("one"));
+    REQUIRE(values.get_subtree("one").get<int>("one") == 1011);
+    REQUIRE(values.get_subtree("one").get<int>("four") == 14);
+    REQUIRE(values.subtree_exists("three"));
+    REQUIRE(values.get_subtree("three").get<int>("three") == 33);
+    REQUIRE_FALSE(values.subtree_exists("two"));
+    REQUIRE_FALSE(values.subtree_exists("other"));
+    REQUIRE_FALSE(values.get_subtree("one").key_exists("two"));
+
+    // Check consistency of copy
+    REQUIRE(copy.subtree_exists("top"));
+    REQUIRE(copy.get_subtree("top").subtree_exists("one"));
+    REQUIRE(copy.get_subtree("top").get_subtree("one").get<int>("one") == 1011);
+    REQUIRE(copy.get_subtree("top").get_subtree("one").get<int>("two") == 12);
+    REQUIRE(copy.get_subtree("top").get_subtree("one").get<int>("four") == 14);
+    REQUIRE(copy.get_subtree("top").subtree_exists("two"));
+    REQUIRE(copy.get_subtree("top").get_subtree("two").get<int>("one") == 21);
+    REQUIRE(copy.get_subtree("top").subtree_exists("three"));
+    REQUIRE(copy.get_subtree("top").get_subtree("three").get<int>("three") == 33);
+    REQUIRE(copy.subtree_exists("other"));
+    REQUIRE(copy.get_subtree("other").get<std::string>("other") == "other");
   }
 }
 

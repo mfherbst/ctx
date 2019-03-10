@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <ctx/demangle.hh>
 #include <iostream>
 #include <map>
 #include <sstream>
@@ -216,8 +217,10 @@ std::vector<T> params::get_vec(const std::string& key) const {
     T val;
     ss >> val >> std::ws;
     if (!ss) {
-      throw_type_mismatch("Could not convert the value \"" + get_str(key) +
-                          "\" for key \"" + key + "\" to the requested type.");
+      throw_type_mismatch(
+            "Could not convert the value \"" + get_str(key) + "\" for key \"" + key +
+            "\" to the requested type vector<" + ctx::demangle(typeid(T)) +
+            ">. Error occurred for parsing value '" + std::to_string(val) + "'.");
     }
     ret.push_back(val);
   }

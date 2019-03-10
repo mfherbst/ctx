@@ -218,10 +218,13 @@ std::vector<T> params::get_vec(const std::string& key) const {
     T val;
     ss >> val >> std::ws;
     if (!ss) {
-      throw_type_mismatch(
-            "Could not convert the value \"" + get_str(key) + "\" for key \"" + key +
-            "\" to the requested type vector<" + ctx::demangle(typeid(T)) +
-            ">. Error occurred for parsing value '" + std::to_string(val) + "'.");
+      std::ostringstream oss;
+      oss << val;
+
+      throw_type_mismatch("Could not convert the value \"" + get_str(key) +
+                          "\" for key \"" + key + "\" to the requested type vector<" +
+                          ctx::demangle(typeid(T)) +
+                          ">. Error occurred for parsing value '" + oss.str() + "'.");
     }
     ret.push_back(val);
   }

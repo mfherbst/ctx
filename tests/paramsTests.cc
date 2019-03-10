@@ -121,7 +121,7 @@ TEST_CASE("Test params", "[params]") {
     std::vector<int> vint;
     p.get_vec("d", vint);
 #else
-    auto vint  = p.get_vec<int>("d");
+    auto vint = p.get_vec<int>("d");
 #endif
     REQUIRE(vint.size() == 2);
     REQUIRE(vint[0] == 1);
@@ -129,9 +129,11 @@ TEST_CASE("Test params", "[params]") {
 
     p.set("d", "\n  1.1e4   -9 \n 0.4 \n\n 19.44");
 #ifdef TEST_QCHEM_LIBCTX
+    REQUIRE_THROWS(p.get_vec<int>("d", vint));
     std::vector<double> vdbl;
     p.get_vec("d", vdbl);
 #else
+    REQUIRE_THROWS(p.get_vec<int>("d"));
     auto vdbl  = p.get_vec<double>("d");
 #endif
     REQUIRE(vdbl.size() == 4);

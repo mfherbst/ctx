@@ -209,8 +209,9 @@ template <typename T>
 std::vector<T> params::get_vec(const std::string& key) const {
   if (!key_exists(key)) return std::vector<T>();
 
+  // Get the key value and add a terminating white space
   std::vector<T> ret;
-  std::istringstream ss(get_str(key));
+  std::istringstream ss(get_str(key) + " ");
   ss >> std::ws;  // Skip leading whitespace.
 
   while (!ss.eof()) {

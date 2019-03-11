@@ -114,4 +114,3 @@ TEST_CASE("Test rc_ptr", "[rc_ptr]") {
 
 }  // namespace tests
 }  // namespace ctx
-

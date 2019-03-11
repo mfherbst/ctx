@@ -1,0 +1,7 @@
+# Put files, which should be ignored from clang tidy
+# here using the relative path from the root of the
+# git repository.
+#
+# The lines of this file are interpreted as globs,
+# so you may use special characters like * or ?
+external/**

@@ -137,3 +137,8 @@ In order to have the tests use the ``libctx`` of
 ``external/libctx``, set the cmake property
 ``TEST_QCHEM_LIBCTX`` via the commandline flag ``-DTEST_QCHEM_LIBCTX=ON``
 when you run cmake.
+
+
+## Citing
+If you find this code useful, please consider citing this software:
+[![DOI](https://zenodo.org/badge/163624261.svg)](https://zenodo.org/badge/latestdoi/163624261)

@@ -28,7 +28,7 @@ set_santise_flags() {
 	case "$SANITISE" in
 		memory)
 			echo "Enabled memory santisier."
-			local SANITISE_FLAGS="$SANITISE_FLAGS -fsanitize=memory -fsanitize-memory-track-origin"
+			local SANITISE_FLAGS="$SANITISE_FLAGS -fsanitize=memory -fsanitize-memory-track-origins"
 			export ASAN_OPTIONS="symbolize=1"
 			;;
 		thread)

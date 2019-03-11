@@ -1,4 +1,4 @@
-#!/bin/bash -ex
+#!/bin/bash -e
 
 set_compilers() {
 	local COMPILER="$1"

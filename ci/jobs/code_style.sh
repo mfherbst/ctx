@@ -1,4 +1,4 @@
-#!/bin/bash -ex
+#!/bin/bash -e
 
 find_run_clang_tidy() {
 	local CLANG_TIDY_VERSION=$(clang-tidy --version | awk '/LLVM version/ {print $3}')
@@ -6,7 +6,9 @@ find_run_clang_tidy() {
 	local MINOR=$(echo "${CLANG_TIDY_VERSION}" | cut -d. -f2)
 	local SUFFIX="${MAJOR}.${MINOR}"
 
-	for path in /usr/lib/llvm-${SUFFIX}/share/clang /usr/lib/llvm-${SUFFIX}/bin; do
+	for path in /usr/bin /usr/local/clang*/bin \
+			/usr/lib/llvm-${SUFFIX}/share/clang \
+			/usr/lib/llvm-${SUFFIX}/bin; do
 		for name in run-clang-tidy.py run-clang-tidy-${SUFFIX}.py; do
 			if [ -x "$path/$name" ]; then
 				echo "$path/$name"
@@ -43,6 +45,10 @@ popd
 if [ "$(git status --untracked-files=no --porcelain=v2 | wc -l)" -gt 0 ]; then
 	echo "Formatting has changed the following files:"
 	git status -s --untracked-files=no
+	echo
+	echo --------------------------------------------------------
+	echo
+	git diff
 	exit 1
 fi
 

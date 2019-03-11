@@ -82,7 +82,7 @@ TEST_CASE("Test params", "[params]") {
     std::vector<int> vint;
     p.get_vec("wsp", vint);
 #else
-    auto vint  = p.get_vec<int>("wsp");
+    auto vint = p.get_vec<int>("wsp");
 #endif
     REQUIRE(vint.empty());
 

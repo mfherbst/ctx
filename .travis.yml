@@ -17,18 +17,17 @@
 ## ---------------------------------------------------------------------
 
 language: cpp
-compiler:
-  - clang
-  - gcc
-
-os:
-  - osx
-  - linux
-
 branches:
   only:
     - master
     - /^v\d+\.\d+(\.\d+)?(-\S*)?$/
+
+compiler:
+  - clang
+  - gcc
+os:
+  - linux
+  - osx
 
 env:
   global:
@@ -43,5 +42,25 @@ addons:
     packages:
       - ninja
 
-
 script: ci/build.sh
+
+# These jobes are only run with the first setup
+# mentioned in the initial list
+jobs:
+  include:
+    - stage: code style  # using clang-7
+      addons:
+       apt:
+         sources:
+           - llvm-toolchain-trusty-5.0
+         packages:
+           - clang-tidy-5.0
+      env: JOB=code_style
+    - stage: sanitise
+      env: SANITISE=address
+    # - env: SANITISE=memory   # TODO Fails due to catch
+
+stages:
+  - sanitise
+  - code style
+  - test

@@ -187,11 +187,13 @@ void throw_type_mismatch(const std::string& str);
 
 template <typename T>
 T params::get(const std::string& key) const {
-  std::istringstream ss(get_str(key));
+  // Get the key value and add a terminating white space
+  std::istringstream ss(get_str(key) + " ");
   T t;
   if (!(ss >> t)) {
     throw_type_mismatch("Could not convert the value \"" + get_str(key) +
-                        "\" for key \"" + key + "\" to the requested type.");
+                        "\" for key \"" + key + "\" to the requested type '" +
+                        ctx::demangle(typeid(T)) + "'");
   }
   return t;
 }

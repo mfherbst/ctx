@@ -64,14 +64,7 @@ endif()
 option(CTX_ENABLE_TESTS "Build ctx tests" ON)
 if(CTX_ENABLE_TESTS)
 	enable_testing()
-
 	add_subdirectory(external/catch2)
-
-	option(TEST_QCHEM_LIBCTX "Build and test Q-Chems libctx library." OFF)
-	if (TEST_QCHEM_LIBCTX)
-		include(cmake/findQchemLibctx.cmake)
-	endif()
-
 	add_subdirectory(tests)
 endif()
 

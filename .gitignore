@@ -9,10 +9,3 @@
 
 # our build directory
 build
-
-# building external projects:
-external/.last_pull
-external/krims
-external/lazyten
-external/libctx
-external/libtest

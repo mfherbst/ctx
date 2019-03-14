@@ -78,64 +78,33 @@ TEST_CASE("Test params", "[params]") {
     params p;
 
     p.set("wsp", "");
-#ifdef TEST_QCHEM_LIBCTX
-    std::vector<int> vint;
-    p.get_vec("wsp", vint);
-#else
-    auto vint = p.get_vec<int>("wsp");
-#endif
+    std::vector<int> vint = p.get_vec<int>("wsp");
     REQUIRE(vint.empty());
 
     p.set("wsp", "   ");
-#ifdef TEST_QCHEM_LIBCTX
-    std::vector<double> vdbl;
-    p.get_vec("wsp", vdbl);
-#else
-    auto vdbl  = p.get_vec<double>("wsp");
-#endif
+    std::vector<double> vdbl = p.get_vec<double>("wsp");
     REQUIRE(vdbl.empty());
 
     p.set("wsp", "	\t\n");
-#ifdef TEST_QCHEM_LIBCTX
-    std::vector<size_t> vsize;
-    p.get_vec("wsp", vsize);
-#else
-    auto vsize = p.get_vec<size_t>("wsp");
-#endif
+    std::vector<size_t> vsize = p.get_vec<size_t>("wsp");
     REQUIRE(vsize.empty());
 
-#ifdef TEST_QCHEM_LIBCTX
-    std::vector<int> vec;
-    p.get_vec<int>("nonexistent", vec);
-    REQUIRE(vec.empty());
-#else
     REQUIRE(p.get_vec<int>("nonexistent").empty());
-#endif
   }
 
   SECTION("Test vector conversion of data strings") {
     params p;
 
     p.set("d", "1\t\n -2\t");
-#ifdef TEST_QCHEM_LIBCTX
-    std::vector<int> vint;
-    p.get_vec("d", vint);
-#else
-    auto vint = p.get_vec<int>("d");
-#endif
+    std::vector<int> vint = p.get_vec<int>("d");
     REQUIRE(vint.size() == 2);
     REQUIRE(vint[0] == 1);
     REQUIRE(vint[1] == -2);
 
     p.set("d", "\n  1.1e4   -9 \n 0.4 \n\n 19.44");
-#ifdef TEST_QCHEM_LIBCTX
-    REQUIRE_THROWS(p.get_vec<int>("d", vint));
-    std::vector<double> vdbl;
-    p.get_vec("d", vdbl);
-#else
     REQUIRE_THROWS(p.get_vec<int>("d"));
-    auto vdbl  = p.get_vec<double>("d");
-#endif
+
+    std::vector<double> vdbl = p.get_vec<double>("d");
     REQUIRE(vdbl.size() == 4);
     REQUIRE(vdbl[0] == 11000.);
     REQUIRE(vdbl[1] == -9);
@@ -143,12 +112,7 @@ TEST_CASE("Test params", "[params]") {
     REQUIRE(vdbl[3] == 19.44);
 
     p.set("d", "	\t\n12 19 27");
-#ifdef TEST_QCHEM_LIBCTX
-    std::vector<size_t> vsize;
-    p.get_vec("d", vsize);
-#else
-    auto vsize = p.get_vec<size_t>("d");
-#endif
+    std::vector<size_t> vsize = p.get_vec<size_t>("d");
     REQUIRE(vsize.size() == 3);
     REQUIRE(vsize[0] == 12);
     REQUIRE(vsize[1] == 19);
@@ -156,14 +120,8 @@ TEST_CASE("Test params", "[params]") {
   }
 
   SECTION("Test workflow with subtrees") {
-// Construct a params object and initialise with some data:
-#ifdef TEST_QCHEM_LIBCTX
-    params p;
-    p.get_subtree("tree").set("data", "1");
-    p.get_subtree("tree").set("string", "string");
-#else
+    // Construct a params object and initialise with some data:
     params p({{"/tree/data", "1"}, {"tree/string", "string"}});
-#endif
     p.set("data", 4);
     p.set("soso", 2);
     p.get_subtree("other").set("data", 99);
@@ -226,21 +184,15 @@ TEST_CASE("Test params", "[params]") {
 
     // Subtree merging
     params q;
-#ifdef TEST_QCHEM_LIBCTX
-    q.set("some", "2");
-    q.get_subtree("any").set("below", "3");
-    q.get_subtree("any").set("above", "4");
-    q.set("extra", "pi");
-#else
     q.map().update(
           {{"some", "2"}, {"any/below", "3"}, {"any/above", "4"}, {"extra", "pi"}});
-#endif
+
     REQUIRE(q.get<int>("some") == 2);
     REQUIRE(q.get_subtree("any").get<int>("below") == 3);
     REQUIRE(q.get_subtree("any").get<int>("above") == 4);
     REQUIRE(q.get<std::string>("extra") == "pi");
 
-    auto& merged = sub.merge_subtree("blubb", q);
+    params& merged = sub.merge_subtree("blubb", q);
 
     // old stuff:
     REQUIRE(p.get<int>("data") == 4);

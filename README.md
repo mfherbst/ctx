@@ -1,24 +1,33 @@
 # ``ctx``: Key-value datastructure for organised hierarchical storage
+[![Build Status](https://travis-ci.org/mfherbst/ctx.svg?branch=master)](https://travis-ci.org/mfherbst/ctx)
+[![Licence](https://img.shields.io/github/license/mfherbst/ctx.svg)](LICENSE)
 
 A common pattern in numerical computation is that input parameters or
-computed simulation data occurs in a tree-like, hierarchical fashion.
-That is to say, that different steps of a simulation algorithm
+computed simulation data should be stored in a tree-like, hierarchical fashion.
+This is no surprise, since different steps of a simulation algorithm
 often deal with larger numbers of parameters or data,
-which is not necessarily of concern for any other part of the full simulation.
-As a result, such objects are best grouped together
-in one part of a larger tree, separate from
-another subtree with the context of data and parameters
-for yet another step of the full procedure.
+where only a subset is of concern for any other part of the
+complete simulation procedure.
+Thus it makes sense to keep the data, which deals with
+one step of the simulation, well-separated from
+the data of any other step.
+A tree-like structure, where different steps
+associate with different subtrees
+is a very intuitive approach to achieve that,
+effectively shielding the context of objects
+related to one step from the objects of others.
+At the same time this naturally allows to represent the structure
+of the simulation framework in the storage scheme as well.
 
-This library allows to achieve exactly that
-by providing a tree-like string-to-value mapping, the `CtxMap`.
-While the key in such a mapping is forced to be a path-like
+This library offers a `C++` implementation of
+of such a tree-like string-to-value mapping, the `CtxMap`.
+While the key in such a mapping is taken to be a path-like
 string such as `/this/is/a/path/to/a/value`,
 the value can be of arbitrary type.
 My means of rich functionality, such as views into subtrees
 or iterators over ranges of keys,
 navigating and accessing such a hierarchical data storage
-is greatly facilitated.
+from different parts of a code is greatly facilitated.
 
 Other key features include:
   - **Based on `shared_ptr`**: All data is stored as `std::shared_ptr`
@@ -45,9 +54,9 @@ ctest
 
 ## Motivation
 The driving force behind `ctx` was to provide a more modern approach
-to the concept of a `context` storage as implemented in the
-`libctx` library
-within the quantum-chemistry package [Q-Chem](https://q-chem.com)
+to the concept of a `context` storage as it was implemented
+in the `libctx` library of the
+quantum-chemistry package [Q-Chem](https://q-chem.com).
 For this the design of data structures such as the
 [PamMap](https://github.com/mfherbst/pammap),
 and the
@@ -58,47 +67,33 @@ Based on the `CtxMap` back-end, `ctx` provides
 a compatibility layer,
 which offers (almost) the same interface as the original `libctx`
 by E. Epifanovsky *et. al.*.
+Under the hood the more flexible `CtxMap` interface
+is always accessible, allowing new take to make
+use of it in a backwards-compatible way.
+As of March 2019, `ctx` has fully replaced `libctx`
+inside the [Q-Chem](https://q-chem.com) source tree.
 
-## Replacing Q-Chem's ``libctx`` by ``ctx``
-In theory it should be as simple as replacing the ``libctx``
-directory by the files of this repository.
-If there are problems compiling Q-Chem this way,
-please let [me](AUTHORS.md) know.
+## Differences between Q-Chem's ``libctx`` and ``ctx``
+As mentioned above ``ctx`` and ``libctx`` largely have the same interface,
+but in order to simplify the implementation with the
+``CtxMap`` support for a few features were dropped.
+Most notable deviations from ``libctx``:
 
-### A word of warning
-I have thoroughly tested both ``ctx`` and ``libctx``
-using the unit test suite in this project and made
-sure that both libraries show the identical behaviour.
-Of cause there could be things I have missed, so
-please beware that ``ctx`` is *not exactly* ``libctx``.
-It should be noted, however, that *adcman* work with ``ctx``
-perfectly and has been used in this way for over two years
-in production.  
+- [``params``](src/ctx/params.h) has no support for iterators
+- Keys inside [``params``](src/ctx/params.h) objects may not
+  contain the character `"/"`.
 
-Other points to mention:
-- ``ctx`` and ``libctx`` largely have the same interface,
-  but in order to simplify the implementation with the
-  ``CtxMap`` I decided to drop support for some stuff.
-  To the best of my knowledge these features are not used anywhere.
-  If this leads to problems when compiling Q-Chem code,
-  please let [me](AUTHORS.md) know. This is considered a bug.
-- Most notable deviations from ``libctx``:
-	- [``params``](src/ctx/params.h) has no support for iterators
-	- Keys inside [``params``](src/ctx/params.h) objects may not
-	  contain the character `"/"`.
-
-### Improvements over ``libctx``
-- This library has extra functionality via the ``map()`` function, which
-  offers access to the internal ``CtxMap`` object.
-- The ``root_storage`` of ``ctx::context`` objects is exactly the ``CtxMap``.
-  In other words, ``ctx::context`` is really only a wrapper around ``CtxMap``.
-  Since all changes done by either acting on the ``root_storage`` as well
-  as the ``ctx::context`` effect the other object, both interfaces
-  can be used simultaneously, e.g.
+Improvements over ``libctx`` include:
+- The ``libctx::root_storage`` of ``libctx::context`` objects is a ``CtxMap``.
+  In other words, ``libctx::context`` is really only a wrapper
+  around ``CtxMap``.
+  Since all changes done by either acting on the ``root_storage`` or
+  the ``libctx::context`` wrapper effect the same underlying object
+  in memory, both interfaces can be used simultaneously, e.g.
   
   ```cpp
   ctx::CtxMap stor{{"bla", 5}};
-  ctx::context ctx(stor);
+  libctx::context ctx(stor);
 
   ctx.update("bla", rc_ptr<int>(new int(6)));
   stor.update("bla", 7);
@@ -108,36 +103,14 @@ Other points to mention:
   
   will print the value ``7`` which has been set via the ``stor`` object,
   i.e. the ``CtxMap`` interface.
-- ``ctx::params`` objects contain a ``CtxMap`` to store their data.
-  It can be referenced (and altered) using the ``map()`` function.
-- Thanks to the ``CtxMap``, ``ctx::context`` objects can now be printed,
+- From a ``ctx::context`` the wrapped ``CtxMap`` object,
+  with its richer functionality can be accessed using the ``map()`` function.
+- ``libctx::params`` objects contain a ``CtxMap`` to store their data.
+  It can be referenced (and altered) using the ``map()`` function as well.
+- Thanks to the ``CtxMap``, ``libctx::context`` objects can now be printed,
   including the data types of the stored data and (for some data types)
   even the values. This is implemented via the usual ``operator<<``
   functionality.
-
-### Testing Q-Chem's ``libctx`` against the ``ctx`` test suite
-It is possible to run the test suite of this library against Q-Chem's ``libctx`` library code.   
-
-For this the build process expects that ``libctx`` is already checked out and
-built under ``external/libctx``. You can roughly achieve this like so
-```
-# First checkout libctx into external/libctx
-cd external
-svn checkout https://url/to/libctx/trunk libctx
-
-# Compile libctx into external/libctx/build
-cd libctx
-mkdir build
-cd build
-cmake ..
-make -j 4
-```
-Now you may configure and build this project.
-In order to have the tests use the ``libctx`` of
-``external/libctx``, set the cmake property
-``TEST_QCHEM_LIBCTX`` via the commandline flag ``-DTEST_QCHEM_LIBCTX=ON``
-when you run cmake.
-
 
 ## Citing
 If you find this code useful, please consider citing this software:

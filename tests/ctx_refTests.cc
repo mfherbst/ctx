@@ -32,11 +32,7 @@ TEST_CASE("Test ctx_ref", "[ctx_ref]") {
   context ctx(stor);
 
   SECTION("Test storing integers") {
-#ifdef TEST_QCHEM_LIBCTX
-    stor.insert("/six", rc_ptr<int>(new int(6)));
-#else
     stor.update("six", 6);
-#endif
     ctx.insert("four", rc_ptr<int>(new int(4)));
     ctx.insert("five", rc_ptr<int>(new int(5)));
 
@@ -50,11 +46,7 @@ TEST_CASE("Test ctx_ref", "[ctx_ref]") {
   }  // integers
 
   SECTION("Test storing strings") {
-#ifdef TEST_QCHEM_LIBCTX
-    stor.insert("/six", rc_ptr<std::string>(new std::string("6")));
-#else
     stor.update("six", "6");
-#endif
     ctx.insert("four", rc_ptr<std::string>(new std::string("4")));
     ctx.insert("five", rc_ptr<std::string>(new std::string("5")));
 
@@ -68,11 +60,7 @@ TEST_CASE("Test ctx_ref", "[ctx_ref]") {
   }  // strings
 
   SECTION("Test storing doubles") {
-#ifdef TEST_QCHEM_LIBCTX
-    stor.insert("/six", rc_ptr<double>(new double(6.0)));
-#else
     stor.update("six", 6.0);
-#endif
     ctx.insert("four", rc_ptr<double>(new double(4.0)));
     ctx.insert("five", rc_ptr<double>(new double(5.0)));
 

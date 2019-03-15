@@ -1,4 +1,4 @@
-# ``ctx``: Key-value datastructure for organised hierarchical storage
+# ``ctx``: Key-value `C++` datastructures for organised hierarchical storage
 [![Build Status](https://travis-ci.org/mfherbst/ctx.svg?branch=master)](https://travis-ci.org/mfherbst/ctx)
 [![Licence](https://img.shields.io/github/license/mfherbst/ctx.svg)](LICENSE)
 
@@ -112,6 +112,9 @@ Improvements over ``libctx`` include:
   even the values. This is implemented via the usual ``operator<<``
   functionality.
 
-## Citing
-If you find this code useful, please consider citing this software:
-[![DOI](https://zenodo.org/badge/163624261.svg)](https://zenodo.org/badge/latestdoi/163624261)
+## Citation [![DOI](https://zenodo.org/badge/163624261.svg)](https://zenodo.org/badge/latestdoi/163624261) [![bibtex](https://img.shields.io/badge/bibtex-download_citation-red.svg)](https://michael-herbst.com/publications/2019.03.14_ctx.bib)
+You can cite `ctx` using this
+[`bibtex` entry](https://michael-herbst.com/publications/2019.03.14_ctx.bib)
+or simply as  
+
+M. F. Herbst. *https://github.com/mfherbst/ctx: Key-value C++ datastructures for organised hierachical storage* (2019), DOI [10.5281/zenodo.2590706](https://doi.org/10.5281/zenodo.2590706).

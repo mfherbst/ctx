@@ -117,4 +117,4 @@ You can cite `ctx` using this
 [`bibtex` entry](https://michael-herbst.com/publications/2019.03.14_ctx.bib)
 or simply as  
 
-M. F. Herbst. *https://github.com/mfherbst/ctx: Key-value C++ datastructures for organised hierachical storage* (2019), DOI [10.5281/zenodo.2590706](https://doi.org/10.5281/zenodo.2590706).
+M. F. Herbst. *ctx: Key-value C++ datastructures for organised hierachical storage* (2019). DOI [10.5281/zenodo.2590706](https://doi.org/10.5281/zenodo.2590706).

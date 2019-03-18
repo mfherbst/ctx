@@ -23,8 +23,7 @@ project(ctx CXX)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 include(cmake/CheckCxxAbi.cmake)
-if (NOT HAVE_CXX_ABI)
-	message(FATAL_ERROR "C++ ABI header is required.")
-endif()
+message(STATUS "c++ ABI found, enabling automatic type demangling")
+set(CTX_ENABLE_TYPE_DEMANGLING HAVE_CXX_ABI)
 
 add_subdirectory(src)

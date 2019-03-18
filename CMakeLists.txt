@@ -46,9 +46,13 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 include(cmake/SetupCompiler.cmake)
 
-include(cmake/CheckCxxAbi.cmake)
-if (NOT HAVE_CXX_ABI)
-	message(FATAL_ERROR "C++ ABI header is required.")
+option(CTX_ENABLE_TYPE_DEMANGLING "Enable automatic C++ type demangling" ON)
+if (CTX_ENABLE_TYPE_DEMANGLING)
+	include(cmake/CheckCxxAbi.cmake)
+	if (NOT HAVE_CXX_ABI)
+		message(FATAL_ERROR
+			"C++ ABI header is required if CTX_ENABLE_TYPE_DEMANGLING=ON")
+	endif()
 endif()
 
 ##########################################################################

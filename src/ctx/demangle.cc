@@ -17,10 +17,11 @@
 #include "demangle.hh"
 #include <cstdlib>
 #include <cstring>
+
+#ifdef CTX_ENABLE_TYPE_DEMANGLING
 #include <cxxabi.h>
 
 namespace ctx {
-
 std::string demangle(const char* mangled) {
   int status;
   char* demangled = abi::__cxa_demangle(mangled, nullptr, nullptr, &status);
@@ -32,5 +33,12 @@ std::string demangle(const char* mangled) {
   }
   return std::string(mangled);
 }
-
 }  // namespace ctx
+
+#else  // CTX_ENABLE_TYPE_DEMANGLING
+
+namespace ctx {
+std::string demangle(const char* mangled) { return std::string(mangled); }
+}  // namespace ctx
+
+#endif  // CTX_ENABLE_TYPE_DEMANGLING

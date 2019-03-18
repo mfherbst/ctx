@@ -24,6 +24,12 @@ set(CTX_SOURCES
   libctx/context.C
 )
 
+if (CTX_ENABLE_TYPE_DEMANGLING)
+	set_property(SOURCE ctx/demangle.cc
+		PROPERTY COMPILE_DEFINITIONS CTX_ENABLE_TYPE_DEMANGLING=1
+	)
+endif()
+
 include_directories(${CMAKE_CURRENT_LIST_DIR})
 add_library(ctx ${CTX_SOURCES})
 set_target_properties(ctx PROPERTIES VERSION "${PROJECT_VERSION}")

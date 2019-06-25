@@ -41,6 +41,7 @@ addons:
   homebrew:
     packages:
       - ninja
+    update: true
 
 script: ci/build.sh
 

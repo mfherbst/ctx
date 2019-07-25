@@ -29,7 +29,7 @@ endif()
 ##########################################################################
 # Project setup
 
-project(ctx VERSION 2.4.1)
+project(ctx VERSION 2.5.0)
 message("\n# Configuring ${PROJECT_NAME}\n#")
 
 if (CMAKE_VERSION VERSION_GREATER 3.5.0)

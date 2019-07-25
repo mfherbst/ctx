@@ -8,8 +8,11 @@ find_run_clang_tidy() {
 
 	for path in /usr/bin /usr/local/clang*/bin \
 			/usr/lib/llvm-${SUFFIX}/share/clang \
-			/usr/lib/llvm-${SUFFIX}/bin; do
-		for name in run-clang-tidy.py run-clang-tidy-${SUFFIX}.py; do
+			/usr/lib/llvm-${SUFFIX}/bin \
+			/usr/lib/llvm-${MAJOR}/share/clang \
+			/usr/lib/llvm-${MAJOR}/bin; do
+		for name in run-clang-tidy.py run-clang-tidy-${SUFFIX}.py \
+				run-clang-tidy-${MAJOR}.py; do
 			if [ -x "$path/$name" ]; then
 				echo "$path/$name"
 				return 0
@@ -34,8 +37,8 @@ cmake -DCMAKE_CXX_COMPILER=${CXX} -DCMAKE_C_COMPILER=${CC} ..
 popd
 
 # Run clang-tidy (disabled for now)
-#./scripts/run-clang-tidy.py -run-clang-tidy "$(find_run_clang_tidy)" \
-#	-j ${CORES:-1} -check-output
+./scripts/run-clang-tidy.py -run-clang-tidy "$(find_run_clang_tidy)" \
+	-j ${CORES:-1} -check-output
 
 # --------------------------------------------------------------
 # Run clang-format on all files of the repo

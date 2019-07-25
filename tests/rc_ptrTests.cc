@@ -31,7 +31,7 @@ TEST_CASE("Test rc_ptr", "[rc_ptr]") {
   }
 
   SECTION("Test initialisation from pointer") {
-    int* i_raw = new int(4);
+    int* i_raw = new int(4);  // NOLINT  Raw pointer needed for test.
     rc_ptr<int> i_ptr(i_raw);
     REQUIRE(i_ptr.get() == i_raw);
   }
@@ -58,7 +58,7 @@ TEST_CASE("Test rc_ptr", "[rc_ptr]") {
     REQUIRE(i_ptr.use_count() == 1);
     REQUIRE(*i_ptr == 42);
 
-    rc_ptr<int> j_ptr(i_ptr);
+    rc_ptr<int> j_ptr(i_ptr);  // NOLINT  Copy is on purpose
     REQUIRE(j_ptr.use_count() == 2);
     REQUIRE(i_ptr.use_count() == 2);
     REQUIRE(*j_ptr == 42);
@@ -70,7 +70,7 @@ TEST_CASE("Test rc_ptr", "[rc_ptr]") {
     REQUIRE(sh_ptr.use_count() == 1);
     REQUIRE(*sh_ptr == 42);
 
-    rc_ptr<int> ptr(sh_ptr);
+    rc_ptr<int> ptr(sh_ptr);  // NOLINT  Copy is on purpose
     REQUIRE(ptr.use_count() == 2);
     REQUIRE(sh_ptr.use_count() == 2);
     REQUIRE(*ptr == 42);
@@ -81,7 +81,7 @@ TEST_CASE("Test rc_ptr", "[rc_ptr]") {
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   SECTION("Test initialisation from auto_ptr") {
     //
-    std::auto_ptr<int> aut_ptr(new int(42));
+    std::auto_ptr<int> aut_ptr(new int(42));  // NOLINT  auto_ptr on purpose
     REQUIRE(*aut_ptr == 42);
     int* addr = aut_ptr.get();
 

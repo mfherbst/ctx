@@ -77,22 +77,6 @@ TEST_CASE("Test rc_ptr", "[rc_ptr]") {
     REQUIRE(ptr.get() == sh_ptr.get());
   }
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-  SECTION("Test initialisation from auto_ptr") {
-    //
-    std::auto_ptr<int> aut_ptr(new int(42));  // NOLINT  auto_ptr on purpose
-    REQUIRE(*aut_ptr == 42);
-    int* addr = aut_ptr.get();
-
-    rc_ptr<int> ptr(aut_ptr);
-    REQUIRE(ptr.use_count() == 1);
-    REQUIRE(*ptr == 42);
-    REQUIRE(ptr.get() == addr);
-    REQUIRE(aut_ptr.get() == nullptr);
-  }
-#pragma GCC diagnostic pop
-
   SECTION("Test initialisation from unique_ptr") {
     std::unique_ptr<int> uniq_ptr(new int(42));
     REQUIRE(*uniq_ptr == 42);

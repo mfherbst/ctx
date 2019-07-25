@@ -46,17 +46,6 @@ class rc_ptr : public std::shared_ptr<T> {
   /** Implictly construct from shared pointer */
   rc_ptr(std::shared_ptr<T> p) : base_type(p) {}
 
-// TODO auto_ptr is deprecated, but since we need the interface,
-// it has to stick for know, unfortunately. Also, getting the
-// auto_ptr by reference and releasing the contained pointer could
-// potentially lead to segfaults and other nasty side effects,
-// so this way of constructing an rc_ptr should really be removed.
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-  template <typename U>
-  explicit rc_ptr(std::auto_ptr<U>& p) : base_type(p.release()) {}
-#pragma GCC diagnostic pop
-
   // Default assignment operators
   rc_ptr& operator=(const rc_ptr& in) = default;
   rc_ptr& operator=(rc_ptr&&) = default;

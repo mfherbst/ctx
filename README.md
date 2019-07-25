@@ -79,6 +79,8 @@ but in order to simplify the implementation with the
 ``CtxMap`` support for a few features were dropped.
 Most notable deviations from ``libctx``:
 
+- **Support** for the deprecated ``std::auto_ptr`` class **has been dropped**.
+  The last `ctx` version with ``std::auto_ptr`` is v2.4.1.
 - [``params``](src/ctx/params.h) has no support for iterators
 - Keys inside [``params``](src/ctx/params.h) objects may not
   contain the character `"/"`.

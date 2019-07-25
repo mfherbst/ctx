@@ -25,7 +25,7 @@ namespace tests {
 namespace genmap_tests {
 template <typename T>
 struct DummyCopyable : public CheaplyCopyable_i, std::array<T, 4> {
-  typedef std::array<T, 4> base_type;
+  using base_type = std::array<T, 4>;
   DummyCopyable(T d1, T d2, T d3, T d4) {
     this->at(0) = d1;
     this->at(1) = d2;

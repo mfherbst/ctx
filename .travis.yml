@@ -51,17 +51,17 @@ jobs:
   include:
     - stage: code style  # using clang-7
       addons:
-       apt:
-         sources:
-           - llvm-toolchain-trusty-5.0
-         packages:
-           - clang-tidy-5.0
+        apt:
+          sources:
+            - llvm-toolchain-xenial-7
+          packages:
+            - clang-tidy-7
       env: JOB=code_style
     - stage: sanitise
       env: SANITISE=address
     # - env: SANITISE=memory   # TODO Fails due to catch
 
 stages:
-  - sanitise
   - code style
   - test
+  - sanitise

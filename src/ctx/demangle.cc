@@ -23,7 +23,7 @@
 
 namespace ctx {
 std::string demangle(const char* mangled) {
-  int status;
+  int status      = 0;
   char* demangled = abi::__cxa_demangle(mangled, nullptr, nullptr, &status);
 
   if (status == 0) {

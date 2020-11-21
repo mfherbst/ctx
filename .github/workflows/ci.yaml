@@ -49,12 +49,11 @@ jobs:
       - name: Setup clang-tidy
         run: |
           mkdir ~/bin
-          echo -e "#!/bin/sh\nclang-tidy-10 \$@" > ~/bin/clang-tidy
+          echo -e '#!/bin/sh\nclang-tidy-10 $@' > ~/bin/clang-tidy
           chmod 755 ~/bin/clang-tidy
       - name: Check code style
         run: ci/build.sh
         env:
-          PATH: ~/bin:${{ env.PATH }}
           JOB: code_style
           CC:  gcc
           CXX: g++

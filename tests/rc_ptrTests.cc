@@ -89,7 +89,7 @@ TEST_CASE("Test rc_ptr", "[rc_ptr]") {
   }
 
   SECTION("Test use as shared_ptr") {
-    auto get_shared_ptr_value = [](std::shared_ptr<int> ptr) { return *ptr; };
+    auto get_shared_ptr_value = [](const std::shared_ptr<int>& ptr) { return *ptr; };
 
     rc_ptr<int> ptr = make_rcptr<int>(42);
     REQUIRE(get_shared_ptr_value(ptr) == 42);

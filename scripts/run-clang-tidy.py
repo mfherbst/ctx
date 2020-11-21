@@ -70,7 +70,8 @@ def main():
         not any(glob.fnmatch.fnmatch(name, ignore) for ignore in ignore_globs)
     ]
 
-    commandline = [args.run_clang_tidy, "-p", args.p, "-clang-tidy", args.clang_tidy]
+    commandline = [args.run_clang_tidy, "-p", args.p, "-clang-tidy", args.clang_tidy,
+                   "-extra-arg=-Wno-unknown-warning-option"]
     if args.j:
         commandline.extend(["-j", args.j])
     if args.export_fixes:

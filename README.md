@@ -1,5 +1,5 @@
 # ``ctx``: Key-value `C++` datastructures for organised hierarchical storage
-[![Build Status](https://travis-ci.com/mfherbst/ctx.svg?branch=master)](https://travis-ci.com/mfherbst/ctx)
+[![Build Status](https://github.com/mfherbst/ctx/workflows/CI/badge.svg?branch=master&event=push)](https://github.com/mfherbst/ctx/actions)
 [![Licence](https://img.shields.io/github/license/mfherbst/ctx.svg)](LICENSE)
 
 A common pattern in numerical computation is that input parameters or

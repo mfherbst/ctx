@@ -21,13 +21,13 @@
 
 ---
 Checks:          'clang-diagnostic-*,clang-analyzer-*,-clang-analyzer-alpha*,
-cppcoreguidelines-*,
+cppcoreguidelines-*,-cppcoreguidelines-avoid-magic-numbers,-cppcoreguidelines-macro-usage,
 google-default-arguments,google-global-names-in-headers,google-runtime-member-string-references,
 llvm-namespace-comment,
 misc-*,-misc-macro-parentheses,-misc-noexcept-move-constructor,-misc-unused-parameters,
-modernize-*,
+modernize-*,-modernize-use-trailing-return-type,
 performance-*,
-readability-*,-readability-else-after-return,-readability-function-size,
+readability-*,-readability-else-after-return,-readability-function-size,-readability-magic-numbers,
 '
 # It would be nice to adhere to
 #   - misc-noexcept-move-constructor            (A lot of work)

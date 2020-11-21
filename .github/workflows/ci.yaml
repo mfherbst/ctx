@@ -42,9 +42,6 @@ jobs:
   style:
     name: Code style
     runs-on: ubuntu-latest
-    env:
-      CC:  gcc
-      CXX: g++
     steps:
       - uses: actions/checkout@v2
       - name: Install dependencies
@@ -57,6 +54,8 @@ jobs:
         run: ci/build.sh
         env:
           JOB: code_style
+          CC:  gcc
+          CXX: g++
   #
   # Sanitise
   #
@@ -71,3 +70,5 @@ jobs:
         run: ci/build.sh
         env:
           SANITISE: address
+          CC:  gcc
+          CXX: g++

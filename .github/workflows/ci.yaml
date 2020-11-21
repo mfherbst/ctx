@@ -47,7 +47,7 @@ jobs:
       CXX: g++
     steps:
       - uses: actions/checkout@v2
-      - name: Install clang-tidy
+      - name: Install dependencies
         run: |
           sudo apt-get install clang-tidy-10
           mkdir ~/bin
@@ -57,16 +57,11 @@ jobs:
         run: ci/build.sh
         env:
           JOB: code_style
-      - name: Sanitise address
-        run: ci/build.sh
-        env:
-          JOB: sanitise
-          SANITISE: address
   #
   # Sanitise
   #
   sanitise:
-    name: Memory sanitisation
+    name: Sanitisation
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -75,5 +70,4 @@ jobs:
       - name: Sanitise address
         run: ci/build.sh
         env:
-          JOB: sanitise
           SANITISE: address

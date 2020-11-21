@@ -40,18 +40,38 @@ jobs:
   # Check code style
   #
   style:
-    name: Code style and sanitisation
+    name: Code style
     runs-on: ubuntu-latest
     env:
       CC:  gcc
       CXX: g++
     steps:
       - uses: actions/checkout@v2
-      - run: sudo apt-get install clang-tidy-10
+      - name: Install clang-tidy
+        run: |
+          sudo apt-get install clang-tidy-10
+          mkdir ~/bin
+          echo -e "#!/bin/sh\nclang-tidy-10 \$@" > ~/bin/clang-tidy
+          chmod 755 ~/bin/clang-tidy
       - name: Check code style
         run: ci/build.sh
         env:
           JOB: code_style
+      - name: Sanitise address
+        run: ci/build.sh
+        env:
+          JOB: sanitise
+          SANITISE: address
+  #
+  # Sanitise
+  #
+  sanitise:
+    name: Memory sanitisation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install dependencies on Linux
+        run: sudo apt-get install ninja-build
       - name: Sanitise address
         run: ci/build.sh
         env:

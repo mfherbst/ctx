@@ -52,7 +52,9 @@ jobs:
           echo -e '#!/bin/sh\nclang-tidy-10 $@' > ~/bin/clang-tidy
           chmod 755 ~/bin/clang-tidy
       - name: Check code style
-        run: ci/build.sh
+        run: |
+          export PATH=$HOME/bin:$PATH
+          ci/build.sh
         env:
           JOB: code_style
           CC:  gcc

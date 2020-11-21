@@ -47,7 +47,7 @@ jobs:
       CXX: g++
     steps:
       - uses: actions/checkout@v2
-      - run: sudo apt-get install clang-tidy
+      - run: sudo apt-get install clang-tidy-10
       - name: Check code style
         run: ci/build.sh
         env:

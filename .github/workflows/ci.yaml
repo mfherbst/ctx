@@ -45,14 +45,16 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install dependencies
+        run: sudo apt-get install clang-tidy-10
+      - name: Setup clang-tidy
         run: |
-          sudo apt-get install clang-tidy-10
           mkdir ~/bin
           echo -e "#!/bin/sh\nclang-tidy-10 \$@" > ~/bin/clang-tidy
           chmod 755 ~/bin/clang-tidy
       - name: Check code style
         run: ci/build.sh
         env:
+          PATH: ${{ env.HOME }}/bin:${{ env.PATH }}
           JOB: code_style
           CC:  gcc
           CXX: g++
